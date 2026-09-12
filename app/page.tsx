@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { ArrowUpRight, ArrowRight, Check, ChevronRight, BookOpen, Sparkles, Code2, Calculator, GraduationCap, Settings2, Globe2, X, Lightbulb, Target, CircleHelp, Send, RotateCcw, Flag, LockKeyhole, CheckCircle2, Circle, Play, Trophy, Brain, Volleyball, Gamepad2, Music2, Rocket, PanelLeftClose } from 'lucide-react';
 import { Profile, Lang, Subject, Stage, Hobby, Bi, bi, subjects, stages, hobbies, makeQuestion, story, topic, Question } from '@/lib/learning';
+import AccountLink from '@/components/auth/account-link';
 import { registerLearningState } from '@/lib/webmcp';
 import { checkRecovery, checkAnswer, Check as AnswerCheck } from '@/lib/checker';
 const hobbyIcons={football:Volleyball,gaming:Gamepad2,music:Music2,space:Rocket};
@@ -69,7 +70,7 @@ export default function Classroom(){
    </div>
   </aside>
   <div className="main-shell">
-   <header className="topbar"><div className="breadcrumb"><button className="mobile-toggle icon-button" onClick={()=>setMobileMenu(!mobileMenu)} aria-label={t('Toggle navigation','פתיחת ניווט')}><PanelLeftClose size={20}/></button>{t('My classroom','הכיתה שלי')}<ChevronRight size={14}/><strong>{b(subjects[p.subject])}</strong></div><div className="top-actions"><span className="demo-pill">{live?t('Live connection','חיבור חי'):t('Interactive demo','הדגמה אינטראקטיבית')}</span><button className="language-button" onClick={()=>changeProfile({lang:l==='en'?'he':'en'})}><Globe2 size={17}/>{l==='en'?'עברית':'English'}</button></div></header>
+   <header className="topbar"><div className="breadcrumb"><button className="mobile-toggle icon-button" onClick={()=>setMobileMenu(!mobileMenu)} aria-label={t('Toggle navigation','פתיחת ניווט')}><PanelLeftClose size={20}/></button>{t('My classroom','הכיתה שלי')}<ChevronRight size={14}/><strong>{b(subjects[p.subject])}</strong></div><div className="top-actions"><AccountLink lang={l}/><span className="demo-pill">{live?t('Live connection','חיבור חי'):t('Interactive demo','הדגמה אינטראקטיבית')}</span><button className="language-button" onClick={()=>changeProfile({lang:l==='en'?'he':'en'})}><Globe2 size={17}/>{l==='en'?'עברית':'English'}</button></div></header>
    <main>
     <div className="page-intro"><div><div className="eyebrow">{t('A LITTLE CURIOSITY. A LOT OF POSSIBILITY.','קצת סקרנות. הרבה אפשרויות.')}</div><h1>{view==='summary'?t('Look how far you’ve come.','תראו כמה התקדמתם.'):t('Let’s make it click.','בואו נבין את זה יחד.')}</h1><p>{t('Your interests. Your pace. A way of learning that feels like you.','התחביבים שלכם. הקצב שלכם. דרך ללמוד שמתאימה לכם.')}</p></div><button className="stage-button" onClick={()=>setSettings(true)}><GraduationCap size={19}/>{b(stages[p.stage])}<Settings2 size={15}/></button></div>
     <div className="subject-tabs" aria-label={t('Subject','מקצוע')}>{(Object.keys(subjects) as Subject[]).map(s=>{const Icon=s==='math'?Calculator:s==='cs'?Code2:Sparkles;return <button key={s} className={p.subject===s?'selected':''} onClick={()=>changeProfile({subject:s})}><Icon size={19}/>{b(subjects[s])}{p.subject===s&&<span className="tab-dot"/>}</button>;})}</div>

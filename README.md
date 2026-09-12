@@ -2,6 +2,14 @@
 
 A bilingual AI teacher **demo** for Israeli primary (grades 4–6), middle (7–9), and high school (10–12). Mathematics, computer science, and a short learning-with-AI course.
 
+## Public site and account setup
+
+The public production site is https://ai-teacher-three-pied.vercel.app.
+
+New bilingual routes: `/login`, `/register`, `/account/complete`, and `/account`. The Supabase integration supports Google OAuth, email OTP sign-in/registration, profile storage, and same-account SMS phone verification. **No Supabase project or delivery providers have been configured yet.** Registration stays visibly disabled until the environment variables are supplied; the classroom demo stays public.
+
+Apply `database/002_profiles.sql` to a new Supabase project and follow [the setup guide in Hebrew](docs/AUTH_SETUP.he.md) for Google, SMTP, SMS, Vercel environment variables, and the remaining live verification checks. Never use a secret/service_role key in a `NEXT_PUBLIC_` variable. Profiles are separate from the future two vector collections.
+
 ## Run
 
 Node.js 22 or newer:
@@ -36,7 +44,7 @@ Open http://127.0.0.1:3000. No keys or external accounts are required. For produ
 
 **No LLM calls, embeddings, or vector database connections are active.** Stories are curated templates; questions are generated from original exercise templates. `/api/tutor` is a reserved server boundary and returns 503. The live option is disabled. The demo does not claim official Israeli curriculum alignment or present its exercises as real Bagrut questions.
 
-The computer science demo checks numeric outputs and tracing; it does not execute student code. The learning-with-AI demo teaches prompting, verification, and privacy, with numerical fact-check exercises. Written-response grading, a full course, authentication, durable student records, analytics, and production safeguarding remain phase 2. The demo stores only school stage, subject, language, and selected hobby in localStorage. Answers and progress remain in browser memory and reset on refresh/profile changes.
+The computer science demo checks numeric outputs and tracing; it does not execute student code. The learning-with-AI demo teaches prompting, verification, and privacy, with numerical fact-check exercises. Written-response grading, a full course, durable learning records, analytics, and production safeguarding remain phase 2. Account authentication and profile storage are implemented behind Supabase configuration; live provider testing is still pending. The demo stores only school stage, subject, language, and selected hobby in localStorage. Answers and progress remain in browser memory and reset on refresh/profile changes.
 
 ## Two vector stores for phase 2
 
@@ -68,13 +76,13 @@ Reference documentation: [OpenAI structured outputs](https://developers.openai.c
 
 Repository: https://github.com/ItayShorian07/ai-teacher
 
-Per the project brief, Vercel deployment is deferred until prototype review. When ready, import this GitHub repository into Vercel, select the Next.js preset, use repository root, and deploy. Demo mode requires no environment variables. Do not enable live AI merely by adding keys: implement the authenticated phase 2 services first.
+Vercel is connected to this repository’s main branch and deploys updates automatically. Demo mode requires no environment variables. To activate accounts, complete docs/AUTH_SETUP.he.md and redeploy. Live AI remains a separate unfinished integration; adding auth keys does not enable it.
 
 Official guides: [Next.js on Vercel](https://vercel.com/docs/frameworks/full-stack/nextjs), [Git deployments](https://vercel.com/docs/git).
 
 ## Validation
 
-`npm test` checks generated answers across 540 track/hobby/level/variant combinations, equation equivalence, malformed notation, arithmetic precedence, and recovery answers. `npm run build` validates TypeScript and creates the Next.js production build. GitHub Actions runs these checks on pushes and pull requests.
+`npm test` checks generated answers across 540 track/hobby/level/variant combinations, equation equivalence, malformed notation, arithmetic precedence, and recovery answers. Auth tests additionally cover required fields, phone normalization, both-channel verification and rejecting a mismatched verified phone. Live Google, email and SMS flows require provider configuration and have not been exercised. `npm run build` validates TypeScript and creates the Next.js production build. GitHub Actions runs these checks on pushes and pull requests.
 
 ## Open product decisions
 
