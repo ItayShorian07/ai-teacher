@@ -1,8 +1,9 @@
 import 'server-only';
 import { serverSupabase } from './supabase/server';
 import { authConfigured,siteOrigin } from './supabase/config';
+import { boundedBody } from './request-body';
 import { AccountProfile } from './auth-validation';
-export const profileColumns='first_name,last_name,city,age,phone,locale';
+export const profileColumns='first_name,last_name,city,age,phone,locale,school,hobbies,custom_hobby';
 export function privateJson(value:unknown,status=200){return Response.json(value,{status,headers:{'Cache-Control':'private, no-store'}});}
 export async function currentAccount(){
  if(!authConfigured())return null;
@@ -19,8 +20,6 @@ export function validOrigin(request:Request){
   return process.env.NODE_ENV==='development'&&client.protocol==='http:'&&target.protocol==='http:'&&loopback.includes(client.hostname)&&loopback.includes(target.hostname)&&client.port===target.port;
  }catch{return false;}
 }
-export async function boundedJson(request:Request){
- if(Number(request.headers.get('content-length')||0)>8192)throw new Error('BODY_TOO_LARGE');
- const body=await request.text();if(new TextEncoder().encode(body).length>8192)throw new Error('BODY_TOO_LARGE');
- return JSON.parse(body);
+export async function boundedJson(request:Request,limit=8192){
+ return JSON.parse((await boundedBody(request,limit)).toString('utf8'));
 }

@@ -12,4 +12,4 @@ export async function proxy(request:NextRequest){
  try{await supabase.auth.getClaims();}catch{/* Protected handlers fail closed if the session cannot be validated. */}
  response.headers.set('Cache-Control','private, no-store');return response;
 }
-export const config={matcher:['/account/:path*','/auth/:path*','/api/account/:path*']};
+export const config={matcher:['/classroom/:path*','/verify','/api/tutor/:path*','/api/answers/:path*','/account/:path*','/auth/:path*','/api/account/:path*']};
