@@ -24,6 +24,12 @@ export function SetupNotice({lang}:{lang:AuthLang}){return <div className="auth-
 export function GoogleIcon(){return <svg aria-hidden="true" width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M43.6 24.5c0-1.5-.1-2.9-.4-4.3H24v8.1h11a9.4 9.4 0 0 1-4.1 6.2v5.2h6.7c3.9-3.6 6-8.8 6-15.2z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.9l-6.7-5.2c-1.8 1.2-4.1 1.9-6.8 1.9-5.3 0-9.8-3.6-11.4-8.4H5.7v5.4A20.4 20.4 0 0 0 24 44z"/><path fill="#FBBC05" d="M12.6 27.4a12.3 12.3 0 0 1 0-7.8v-5.4H5.7A20.4 20.4 0 0 0 3.5 24c0 3.3.8 6.4 2.2 9.2l6.9-5.8z"/><path fill="#EA4335" d="M24 12.2c3 0 5.7 1 7.8 3.1l5.9-5.9A19.7 19.7 0 0 0 24 4C16 4 9.1 8.6 5.7 15.2l6.9 5.4C14.2 15.8 18.7 12.2 24 12.2z"/></svg>;}
 export const authErrorText=(code:string,lang:AuthLang)=>{
  const messages:Record<string,[string,string]>={
+  invalid_login:['Enter your username or email and password.','הזינו שם משתמש או מייל וסיסמה.'],
+  invalid_credentials:['The username/email or password is incorrect, or the email has not been verified. Use an email code or reset your password.','שם המשתמש/המייל או הסיסמה שגויים, או שהמייל עדיין לא אומת. אפשר להיכנס בקוד למייל או לאפס סיסמה.'],
+  username_unavailable:['This username is already taken. Please choose another.','שם המשתמש הזה כבר תפוס. בחרו שם אחר.'],
+  weak_password:['Use a password with 12–128 characters.','בחרו סיסמה באורך 12–128 תווים.'],
+  password_mismatch:['The passwords do not match.','הסיסמאות אינן זהות.'],
+  same_password:['Choose a password different from your current password.','בחרו סיסמה שונה מהסיסמה הנוכחית.'],
   delete_unavailable:['Account deletion is temporarily unavailable. Please contact support.','מחיקת החשבון אינה זמינה כרגע. פנו אלינו דרך יצירת קשר.'],
   invalid_profile:['Check the names, city, age, school and phone number.','בדקו את השם, היישוב, הגיל, בית הספר ומספר הטלפון.'],
   invalid_email:['Enter a valid email address.','הזינו כתובת מייל תקינה.'],

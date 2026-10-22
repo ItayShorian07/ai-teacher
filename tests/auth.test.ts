@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { profileSchema,normalizePhone,accountComplete,emailSchema,otpSchema } from '../lib/auth-validation';
-const profile={first_name:'נועה',last_name:'לוי',city:'חיפה',age:14,phone:'+972501234567',locale:'he',school:'תיכון חיפה'};
+const profile={username:'noa_levi',first_name:'נועה',last_name:'לוי',city:'חיפה',age:14,phone:'+972501234567',locale:'he',school:'תיכון חיפה'};
 const user={email:'student@example.test',email_confirmed_at:'2026-09-12',phone:'972501234567',phone_confirmed_at:'2026-09-12'};
 test('Israeli phone formats canonicalize without losing international support',()=>{
  for(const phone of ['050-123-4567','050 123 4567','972501234567','+972 (50) 123-4567'])assert.equal(normalizePhone(phone),profile.phone);
@@ -33,4 +33,5 @@ test('nullable optional hobbies from Postgres do not block a complete account',(
  assert.equal(accountComplete(user,{...profile,custom_hobby:null}),true);
  assert.deepEqual(profileSchema.parse({...profile,hobbies:['music','music']}).hobbies,['music']);
  assert.equal(accountComplete(user,{...profile,school:undefined}),false);
+ assert.equal(accountComplete(user,{...profile,username:undefined}),false);
 });

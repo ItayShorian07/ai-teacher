@@ -11,6 +11,7 @@ export async function POST(request:Request){
   const {error}=account.profile
    ?await account.supabase.from('profiles').update(parsed.data).eq('id',account.user.id)
    :await account.supabase.from('profiles').insert({id:account.user.id,...parsed.data});
+  if(error?.code==='23505')return privateJson({error:'username_unavailable'},409);
   if(error)return privateJson({error:'profile_unavailable'},503);
   return privateJson({saved:true,complete:accountComplete(account.user,parsed.data)});
  }catch{return privateJson({error:'unavailable'},400);}

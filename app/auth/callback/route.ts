@@ -5,7 +5,7 @@ export async function GET(request:NextRequest){
  const target=process.env.NODE_ENV==='development'&&['localhost','127.0.0.1'].includes(request.nextUrl.hostname)?request.nextUrl.origin:siteOrigin();const code=request.nextUrl.searchParams.get('code');
  if(authConfigured()&&code&&code.length<4096){
   try{const supabase=await serverSupabase();const {error}=await supabase.auth.exchangeCodeForSession(code);
-   if(!error){const response=NextResponse.redirect(new URL('/account/complete',target));response.headers.set('Cache-Control','private, no-store');return response;}
+   if(!error){const destination=request.nextUrl.searchParams.get('next')==='password'?'/account/password':'/account/complete';const response=NextResponse.redirect(new URL(destination,target));response.headers.set('Cache-Control','private, no-store');return response;}
   }catch{}
  }
  const response=NextResponse.redirect(new URL('/login?error=callback',target));response.headers.set('Cache-Control','private, no-store');return response;

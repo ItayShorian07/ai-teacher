@@ -3,7 +3,7 @@ import { serverSupabase } from './supabase/server';
 import { authConfigured,siteOrigin } from './supabase/config';
 import { boundedBody } from './request-body';
 import { AccountProfile } from './auth-validation';
-export const profileColumns='first_name,last_name,city,age,phone,locale,school,hobbies,custom_hobby';
+export const profileColumns='username,first_name,last_name,city,age,phone,locale,school,hobbies,custom_hobby';
 export function privateJson(value:unknown,status=200){return Response.json(value,{status,headers:{'Cache-Control':'private, no-store'}});}
 export async function currentAccount(){
  if(!authConfigured())return null;

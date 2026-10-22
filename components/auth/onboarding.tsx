@@ -11,6 +11,7 @@ export default function Onboarding({ email, initialProfile, initialLang, emailVe
   const { lang, setLang, t } = useAuthLanguage(initialLang);
 
   const [details, setDetails] = useState({
+    username: initialProfile.username || '',
     first_name: initialProfile.first_name || '',
     last_name: initialProfile.last_name || '',
     city: initialProfile.city || '',
@@ -70,6 +71,8 @@ export default function Onboarding({ email, initialProfile, initialLang, emailVe
       {error && <div className="auth-error" role="alert">{authErrorText(error, lang)}</div>}
 
       <form onSubmit={save} className="auth-form">
+        {input('username',t('Username','שם משתמש'),{dir:'ltr',autoComplete:'username',autoCapitalize:'none',spellCheck:false,minLength:3,maxLength:30,pattern:'[A-Za-z][A-Za-z0-9_]{2,29}'})}
+        <p className="auth-field-note">{t('3–30 English letters, numbers or underscores. Start with a letter.','3–30 אותיות באנגלית, ספרות או קו תחתון. מתחילים באות.')}</p>
         {/* Required fields */}
         <div className="auth-field-row">
           {input('first_name', t('First name', 'שם פרטי'), { autoComplete: 'given-name' })}

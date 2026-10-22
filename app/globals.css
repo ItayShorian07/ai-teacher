@@ -33,3 +33,9 @@ html[data-theme=dark] :is(.code-block,.question-equation){background:#0d1913;col
 html[data-theme=dark] .auth-error{background:#452529;color:#ffc7cd}
 html[data-theme=dark] .hobby-row button.chosen{background:var(--mint);color:var(--green)}
 @media(max-width:540px){.theme-toggle{width:33px;height:33px}.top-actions{gap:8px}.auth-top>div{gap:10px}.auth-top .language-button{font-size:12px}.help-page{padding-inline:20px}}
+/* Account credentials */
+.auth-methods{display:flex;gap:8px;margin:0 0 22px;background:var(--surface,#f4f6f2);padding:5px;border-radius:12px}
+.auth-methods button{flex:1;border:1px solid transparent;padding:10px 8px;border-radius:9px;color:inherit;background:transparent;font:inherit;font-size:13px;cursor:pointer}
+.auth-methods button[aria-pressed="true"]{background:var(--paper,#fff);border-color:var(--line,#dce3d9);font-weight:600;box-shadow:0 2px 5px #172a1c08}
+.auth-methods button:focus-visible,.auth-password-help:focus-visible{outline:2px solid #168061;outline-offset:3px}
+.auth-password-help{font-size:13px;text-decoration:underline;color:var(--green,#146d56);justify-self:start}

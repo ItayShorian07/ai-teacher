@@ -9,6 +9,6 @@ export default async function Complete({searchParams}:{searchParams:Promise<{edi
  if(accountComplete(account.user,account.profile)&&params.edit!=='1')redirect('/account');
  const meta=account.user.user_metadata||{};
  const text=(value:unknown)=>typeof value==='string'?value.slice(0,100):'';
- const initial=account.profile||{first_name:text(meta.first_name||meta.given_name),last_name:text(meta.last_name||meta.family_name),city:text(meta.city),phone:text(meta.phone),age:typeof meta.age==='number'?meta.age:undefined,school:text(meta.school),hobbies:Array.isArray(meta.hobbies)?meta.hobbies.filter((h:unknown)=>typeof h==='string').slice(0,20):[],custom_hobby:text(meta.custom_hobby),locale:meta.locale==='en'?'en' as const:'he' as const};
+ const initial=account.profile||{username:text(meta.username),first_name:text(meta.first_name||meta.given_name),last_name:text(meta.last_name||meta.family_name),city:text(meta.city),phone:text(meta.phone),age:typeof meta.age==='number'?meta.age:undefined,school:text(meta.school),hobbies:Array.isArray(meta.hobbies)?meta.hobbies.filter((h:unknown)=>typeof h==='string').slice(0,20):[],custom_hobby:text(meta.custom_hobby),locale:meta.locale==='en'?'en' as const:'he' as const};
  return <Onboarding email={account.user.email||''} emailVerified={Boolean(account.user.email_confirmed_at)} initialProfile={initial} initialLang={initial.locale==='en'?'en':'he'}/>;
 }
