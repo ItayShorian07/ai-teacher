@@ -1,12 +1,26 @@
-import { NextRequest,NextResponse } from 'next/server';
-import { authConfigured,siteOrigin } from '@/lib/supabase/config';
+import { NextRequest, NextResponse } from 'next/server';
+import { authConfigured } from '@/lib/supabase/config';
+import { callbackOrigin } from '@/lib/request-origin';
 import { serverSupabase } from '@/lib/supabase/server';
-export async function GET(request:NextRequest){
- const target=process.env.NODE_ENV==='development'&&['localhost','127.0.0.1'].includes(request.nextUrl.hostname)?request.nextUrl.origin:siteOrigin();const code=request.nextUrl.searchParams.get('code');
- if(authConfigured()&&code&&code.length<4096){
-  try{const supabase=await serverSupabase();const {error}=await supabase.auth.exchangeCodeForSession(code);
-   if(!error){const response=NextResponse.redirect(new URL('/account/complete',target));response.headers.set('Cache-Control','private, no-store');return response;}
-  }catch{}
- }
- const response=NextResponse.redirect(new URL('/login?error=callback',target));response.headers.set('Cache-Control','private, no-store');return response;
+export async function GET(request: NextRequest) {
+  const target = callbackOrigin(request.url, process.env);
+  const code = request.nextUrl.searchParams.get('code');
+  if (authConfigured() && code && code.length < 4096) {
+    try {
+      const supabase = await serverSupabase();
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (!error) {
+        const response = NextResponse.redirect(
+          new URL('/account/complete', target),
+        );
+        response.headers.set('Cache-Control', 'private, no-store');
+        return response;
+      }
+    } catch {}
+  }
+  const response = NextResponse.redirect(
+    new URL('/login?error=callback', target),
+  );
+  response.headers.set('Cache-Control', 'private, no-store');
+  return response;
 }

@@ -1,1 +1,18 @@
-export const interests = [ ['football','Football','כדורגל'],['gaming','Gaming','גיימינג'],['music','Music','מוזיקה'],['space','Space','חלל'],['cooking','Cooking','בישול'],['anime','Anime','אנימה'],['basketball','Basketball','כדורסל'],['dance','Dance','ריקוד'],['drawing','Drawing','ציור'],['coding','Coding','תכנות'],['movies','Movies','סרטים'],['hiking','Hiking','טיולים'],['reading','Reading','קריאה'],['swimming','Swimming','שחייה'],['robotics','Robotics','רובוטיקה'],['photography','Photography','צילום'] ];
+export const interests = [
+  ['football', 'Football', 'כדורגל'],
+  ['gaming', 'Gaming', 'גיימינג'],
+  ['music', 'Music', 'מוזיקה'],
+  ['space', 'Space', 'חלל'],
+  ['cooking', 'Cooking', 'בישול'],
+  ['anime', 'Anime', 'אנימה'],
+  ['basketball', 'Basketball', 'כדורסל'],
+  ['dance', 'Dance', 'ריקוד'],
+  ['drawing', 'Drawing', 'ציור'],
+  ['coding', 'Coding', 'תכנות'],
+  ['movies', 'Movies', 'סרטים'],
+  ['hiking', 'Hiking', 'טיולים'],
+  ['reading', 'Reading', 'קריאה'],
+  ['swimming', 'Swimming', 'שחייה'],
+  ['robotics', 'Robotics', 'רובוטיקה'],
+  ['photography', 'Photography', 'צילום'],
+];
