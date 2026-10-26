@@ -1,5 +1,5 @@
 /** Enforce the byte limit even when Content-Length is missing or incorrect. */
-export async function boundedBody(
+export async function readRequestBody(
   request: Request,
   limit: number,
 ): Promise<Buffer<ArrayBuffer>> {

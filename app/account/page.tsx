@@ -1,16 +1,16 @@
+import AccountDetails from '@/components/auth/account-details';
+import { isAccountComplete } from '@/lib/auth-validation';
+import { getCurrentAccount } from '@/lib/server/account';
 import { redirect } from 'next/navigation';
-import { currentAccount } from '@/lib/account-server';
-import { accountComplete } from '@/lib/auth-validation';
-import AccountScreen from '@/components/auth/account-screen';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'החשבון שלי · My account | Limud' };
-export default async function Account() {
-  const account = await currentAccount();
+export default async function AccountPage() {
+  const account = await getCurrentAccount();
   if (!account) redirect('/login');
-  if (!accountComplete(account.user, account.profile))
+  if (!isAccountComplete(account.user, account.profile))
     redirect('/account/complete');
   return (
-    <AccountScreen
+    <AccountDetails
       profile={account.profile!}
       email={account.user.email!}
       phone={account.profile!.phone}

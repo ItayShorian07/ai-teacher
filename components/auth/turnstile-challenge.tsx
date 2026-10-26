@@ -5,7 +5,7 @@ type Turnstile = {
   render: (element: HTMLElement, options: Record<string, unknown>) => string;
   remove: (id: string) => void;
 };
-export function Captcha({
+export function TurnstileChallenge({
   onToken,
   resetKey,
   action = 'auth',

@@ -1,6 +1,6 @@
 'use client';
-import { useSyncExternalStore } from 'react';
 import { Moon, Sun } from 'lucide-react';
+import { useSyncExternalStore } from 'react';
 
 function subscribeToTheme(onChange: () => void) {
   const observer = new MutationObserver(onChange);
@@ -19,7 +19,11 @@ function serverTheme() {
   return false;
 }
 
-export default function ThemeToggle({ lang = 'he' }: { lang?: 'he' | 'en' }) {
+export default function ThemeToggle({
+  language = 'he',
+}: {
+  language?: 'he' | 'en';
+}) {
   const dark = useSyncExternalStore(subscribeToTheme, isDarkTheme, serverTheme);
   function toggle() {
     const next = !dark;
@@ -29,7 +33,7 @@ export default function ThemeToggle({ lang = 'he' }: { lang?: 'he' | 'en' }) {
     } catch {}
   }
   const label =
-    lang === 'he'
+    language === 'he'
       ? dark
         ? 'מעבר למצב בהיר'
         : 'מעבר למצב כהה'

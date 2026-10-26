@@ -1,11 +1,13 @@
 'use client';
+import { useLanguage } from '@/hooks/use-language';
+import { getAuthErrorMessage } from '@/lib/auth-error-messages';
+import { AccountProfile } from '@/lib/auth-validation';
+import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { ArrowRight, CheckCircle2, LogOut, Settings2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
-import { ArrowRight, CheckCircle2, LogOut, Settings2 } from 'lucide-react';
-import { AccountProfile } from '@/lib/auth-validation';
-import { browserSupabase } from '@/lib/supabase/client';
-import { AuthFrame, useAuthLanguage, authErrorText } from './shared';
-export default function AccountScreen({
+import { AuthLayout } from './auth-layout';
+export default function AccountDetails({
   profile,
   email,
   phone,
@@ -14,113 +16,115 @@ export default function AccountScreen({
   email: string;
   phone: string;
 }) {
-  const { lang, setLang, t } = useAuthLanguage(profile.locale);
-  const [busy, setBusy] = useState(false);
+  const { language, setLanguage, translate } = useLanguage(profile.locale);
+  const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [confirmation, setConfirmation] = useState('');
   async function signOut() {
-    if (busy) return;
-    setBusy(true);
+    if (isBusy) return;
+    setIsBusy(true);
     try {
-      const { error: err } = await browserSupabase().auth.signOut({
+      const { error: err } = await createBrowserSupabaseClient().auth.signOut({
         scope: 'local',
       });
       if (err) throw err;
       // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- Clear session-scoped client state after sign-out.
-      window.location.assign(`/login?lang=${lang}`);
+      window.location.assign(`/login?lang=${language}`);
     } catch {
       setError('unavailable');
-      setBusy(false);
+      setIsBusy(false);
     }
   }
   async function deleteAccount() {
-    if (busy || confirmation !== 'DELETE') return;
-    setBusy(true);
+    if (isBusy || confirmation !== 'DELETE') return;
+    setIsBusy(true);
     setError('');
     try {
-      const r = await fetch('/api/account/delete', {
+      const response = await fetch('/api/account/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ confirmation }),
       });
-      if (!r.ok) throw new Error();
+      if (!response.ok) throw new Error();
       // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- Clear session-scoped client state after account deletion.
       window.location.assign('/');
     } catch {
       setError('delete_unavailable');
-      setBusy(false);
+      setIsBusy(false);
     }
   }
   return (
-    <AuthFrame
-      lang={lang}
-      onLanguage={() => setLang(lang === 'he' ? 'en' : 'he')}
+    <AuthLayout
+      language={language}
+      onToggleLanguage={() => setLanguage(language === 'he' ? 'en' : 'he')}
       step={3}
     >
       <div className="account-success-icon">
         <CheckCircle2 size={34} />
       </div>
-      <div className="auth-card-label">{t('YOU’RE ALL SET', 'הכול מוכן')}</div>
+      <div className="auth-card-label">
+        {translate('YOU’RE ALL SET', 'הכול מוכן')}
+      </div>
       <h1>
-        {t(
+        {translate(
           `Welcome, ${profile.first_name}`,
           `ברוכים הבאים, ${profile.first_name}`,
         )}
       </h1>
       <p className="auth-subtitle">
-        {t(
+        {translate(
           'Your email is verified. Your account is ready.',
           'המייל אומת. החשבון שלכם מוכן.',
         )}
       </p>
       {error && (
         <div className="auth-error" role="alert">
-          {authErrorText(error, lang)}
+          {getAuthErrorMessage(error, language)}
         </div>
       )}
       <dl className="account-details">
         <div>
-          <dt>{t('Full name', 'שם מלא')}</dt>
+          <dt>{translate('Full name', 'שם מלא')}</dt>
           <dd>
             {profile.first_name} {profile.last_name}
           </dd>
         </div>
         <div>
-          <dt>{t('City / town', 'עיר / יישוב')}</dt>
+          <dt>{translate('City / town', 'עיר / יישוב')}</dt>
           <dd>{profile.city}</dd>
         </div>
         <div>
-          <dt>{t('Age', 'גיל')}</dt>
+          <dt>{translate('Age', 'גיל')}</dt>
           <dd>{profile.age}</dd>
         </div>
         <div>
           <dt>
-            {t('Email', 'מייל')} <CheckCircle2 size={14} />
+            {translate('Email', 'מייל')} <CheckCircle2 size={14} />
           </dt>
           <dd dir="ltr">{email}</dd>
         </div>
         <div>
-          <dt>{t('Phone', 'טלפון')}</dt>
+          <dt>{translate('Phone', 'טלפון')}</dt>
           <dd dir="ltr">{phone}</dd>
         </div>
       </dl>
       <Link className="primary-button auth-submit" href="/classroom">
-        {t('Go to my classroom', 'לכיתה שלי')}
+        {translate('Go to my classroom', 'לכיתה שלי')}
         <ArrowRight size={17} />
       </Link>
       <div className="account-actions">
         <Link href="/account/complete?edit=1">
           <Settings2 size={16} />
-          {t('Edit details', 'עריכת פרטים')}
+          {translate('Edit details', 'עריכת פרטים')}
         </Link>
-        <button onClick={signOut} disabled={busy}>
+        <button onClick={signOut} disabled={isBusy}>
           <LogOut size={16} />
-          {t('Sign out', 'התנתקות')}
+          {translate('Sign out', 'התנתקות')}
         </button>
       </div>
       <p className="auth-field-note">
-        {t(
+        {translate(
           'Your account details are saved. Learning progress in the demo is still limited to the current session.',
           'פרטי החשבון נשמרים. ההתקדמות הלימודית בדמו עדיין מוגבלת למפגש הנוכחי.',
         )}
@@ -129,13 +133,13 @@ export default function AccountScreen({
         {deleting ? (
           <>
             <p>
-              {t(
+              {translate(
                 'Permanently deletes your profile and private learning data. Type DELETE to confirm.',
                 'הפעולה מוחקת לצמיתות את הפרופיל ואת נתוני הלמידה הפרטיים. הקלידו DELETE לאישור.',
               )}
             </p>
             <label className="auth-field">
-              {t('Confirmation', 'אישור מחיקה')}
+              {translate('Confirmation', 'אישור מחיקה')}
               <input
                 value={confirmation}
                 onChange={(e) => setConfirmation(e.target.value)}
@@ -145,27 +149,27 @@ export default function AccountScreen({
             </label>
             <button
               className="danger-button"
-              disabled={busy || confirmation !== 'DELETE'}
+              disabled={isBusy || confirmation !== 'DELETE'}
               onClick={deleteAccount}
             >
-              {t('Permanently delete', 'מחיקה לצמיתות')}
+              {translate('Permanently delete', 'מחיקה לצמיתות')}
             </button>
             <button
               onClick={() => {
                 setDeleting(false);
                 setConfirmation('');
               }}
-              disabled={busy}
+              disabled={isBusy}
             >
-              {t('Cancel', 'ביטול')}
+              {translate('Cancel', 'ביטול')}
             </button>
           </>
         ) : (
           <button className="danger-button" onClick={() => setDeleting(true)}>
-            {t('Delete account', 'מחיקת חשבון')}
+            {translate('Delete account', 'מחיקת חשבון')}
           </button>
         )}
       </div>
-    </AuthFrame>
+    </AuthLayout>
   );
 }

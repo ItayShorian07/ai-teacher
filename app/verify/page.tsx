@@ -1,11 +1,14 @@
+import HumanVerificationForm from '@/components/auth/human-verification-form';
+import { getCurrentAccount } from '@/lib/server/account';
+import {
+  hasHumanVerification,
+  isCaptchaConfigured,
+} from '@/lib/server/learning-access';
 import { redirect } from 'next/navigation';
-import { currentAccount } from '@/lib/account-server';
-import { botConfigured, hasBotPass } from '@/lib/learning-access';
-import VerifyHuman from '@/components/auth/verify-human';
-export default async function Verify() {
-  const account = await currentAccount();
+export default async function VerificationPage() {
+  const account = await getCurrentAccount();
   if (!account) redirect('/');
-  if (!botConfigured() || (await hasBotPass(account.user.id)))
+  if (!isCaptchaConfigured() || (await hasHumanVerification(account.user.id)))
     redirect('/classroom');
-  return <VerifyHuman />;
+  return <HumanVerificationForm />;
 }

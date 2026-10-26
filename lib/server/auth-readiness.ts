@@ -1,8 +1,8 @@
 import 'server-only';
-import { authConfigured, authConfig } from './supabase/config';
-export async function authReadiness() {
-  if (!authConfigured()) return { configured: false, google: false };
-  const { url, key } = authConfig();
+import { getSupabaseConfig, isAuthConfigured } from '../supabase/config';
+export async function getAuthReadiness() {
+  if (!isAuthConfigured()) return { configured: false, google: false };
+  const { url, key } = getSupabaseConfig();
   try {
     const [settings, table] = await Promise.all([
       fetch(`${url}/auth/v1/settings`, {

@@ -1,8 +1,8 @@
 'use client';
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { UserRound } from 'lucide-react';
-export default function AccountLink({ lang }: { lang: 'he' | 'en' }) {
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+export default function AccountLink({ language }: { language: 'he' | 'en' }) {
   const [signedIn, setSignedIn] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
@@ -18,15 +18,15 @@ export default function AccountLink({ lang }: { lang: 'he' | 'en' }) {
   return (
     <Link
       className="account-nav-link"
-      href={signedIn ? '/account' : `/login?lang=${lang}`}
+      href={signedIn ? '/account' : `/login?lang=${language}`}
     >
       <UserRound size={17} />
       <span>
         {signedIn
-          ? lang === 'he'
+          ? language === 'he'
             ? 'החשבון שלי'
             : 'My account'
-          : lang === 'he'
+          : language === 'he'
             ? 'התחברות'
             : 'Sign in'}
       </span>

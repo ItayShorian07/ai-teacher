@@ -1,6 +1,6 @@
 import type { NextConfig } from 'next';
-import { environmentErrors } from './lib/environment';
 import environmentTargets from './config/environments.json';
+import { environmentErrors } from './lib/environment';
 
 const errors = environmentErrors(process.env, environmentTargets);
 if (errors.length) {

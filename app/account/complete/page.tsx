@@ -1,20 +1,20 @@
+import ProfileForm from '@/components/auth/profile-form';
+import { isAccountComplete } from '@/lib/auth-validation';
+import { getCurrentAccount } from '@/lib/server/account';
 import { redirect } from 'next/navigation';
-import { currentAccount } from '@/lib/account-server';
-import { accountComplete } from '@/lib/auth-validation';
-import Onboarding from '@/components/auth/onboarding';
 export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'השלמת הרשמה · Complete your account | Limud',
 };
-export default async function Complete({
+export default async function CompleteProfilePage({
   searchParams,
 }: {
   searchParams: Promise<{ edit?: string }>;
 }) {
   const params = await searchParams;
-  const account = await currentAccount();
+  const account = await getCurrentAccount();
   if (!account) redirect('/login');
-  if (accountComplete(account.user, account.profile) && params.edit !== '1')
+  if (isAccountComplete(account.user, account.profile) && params.edit !== '1')
     redirect('/account');
   const meta = account.user.user_metadata || {};
   const text = (value: unknown) =>
@@ -33,11 +33,11 @@ export default async function Complete({
     locale: meta.locale === 'en' ? ('en' as const) : ('he' as const),
   };
   return (
-    <Onboarding
+    <ProfileForm
       email={account.user.email || ''}
       emailVerified={Boolean(account.user.email_confirmed_at)}
       initialProfile={initial}
-      initialLang={initial.locale === 'en' ? 'en' : 'he'}
+      initialLanguage={initial.locale === 'en' ? 'en' : 'he'}
     />
   );
 }

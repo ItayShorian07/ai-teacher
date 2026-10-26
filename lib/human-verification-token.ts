@@ -1,11 +1,15 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
-export function signBotPass(userId: string, secret: string, now = Date.now()) {
+export function createHumanVerificationToken(
+  userId: string,
+  secret: string,
+  now = Date.now(),
+) {
   const value = Buffer.from(
     JSON.stringify({ sub: userId, exp: now + 30 * 60 * 1000 }),
   ).toString('base64url');
   return `${value}.${createHmac('sha256', secret).update(value).digest('base64url')}`;
 }
-export function verifyBotPass(
+export function verifyHumanVerificationToken(
   token: string | undefined,
   userId: string,
   secret: string,

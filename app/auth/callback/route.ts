@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { authConfigured } from '@/lib/supabase/config';
 import { callbackOrigin } from '@/lib/request-origin';
-import { serverSupabase } from '@/lib/supabase/server';
+import { isAuthConfigured } from '@/lib/supabase/config';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest) {
   const target = callbackOrigin(request.url, process.env);
   const code = request.nextUrl.searchParams.get('code');
-  if (authConfigured() && code && code.length < 4096) {
+  if (isAuthConfigured() && code && code.length < 4096) {
     try {
-      const supabase = await serverSupabase();
+      const supabase = await createServerSupabaseClient();
       const { error } = await supabase.auth.exchangeCodeForSession(code);
       if (!error) {
         const response = NextResponse.redirect(

@@ -1,20 +1,20 @@
-import AuthScreen from '@/components/auth/auth-screen';
-import { authReadiness } from '@/lib/auth-readiness';
+import AuthForm from '@/components/auth/auth-form';
+import { getAuthReadiness } from '@/lib/server/auth-readiness';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'הרשמה · Create account | Limud' };
-export default async function Register({
+export default async function RegistrationPage({
   searchParams,
 }: {
   searchParams: Promise<{ lang?: string }>;
 }) {
-  const p = await searchParams;
-  const ready = await authReadiness();
+  const parameters = await searchParams;
+  const ready = await getAuthReadiness();
   return (
-    <AuthScreen
+    <AuthForm
       mode="register"
       configured={ready.configured}
       googleEnabled={ready.google}
-      initialLang={p.lang === 'en' ? 'en' : 'he'}
+      initialLanguage={parameters.lang === 'en' ? 'en' : 'he'}
     />
   );
 }

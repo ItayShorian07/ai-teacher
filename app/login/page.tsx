@@ -1,21 +1,21 @@
-import AuthScreen from '@/components/auth/auth-screen';
-import { authReadiness } from '@/lib/auth-readiness';
+import AuthForm from '@/components/auth/auth-form';
+import { getAuthReadiness } from '@/lib/server/auth-readiness';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'התחברות · Sign in | Limud' };
-export default async function Login({
+export default async function LoginPage({
   searchParams,
 }: {
   searchParams: Promise<{ lang?: string; error?: string }>;
 }) {
-  const p = await searchParams;
-  const ready = await authReadiness();
+  const parameters = await searchParams;
+  const ready = await getAuthReadiness();
   return (
-    <AuthScreen
+    <AuthForm
       mode="login"
       configured={ready.configured}
       googleEnabled={ready.google}
-      initialLang={p.lang === 'en' ? 'en' : 'he'}
-      errorCode={p.error === 'callback' ? 'callback' : ''}
+      initialLanguage={parameters.lang === 'en' ? 'en' : 'he'}
+      errorCode={parameters.error === 'callback' ? 'callback' : ''}
     />
   );
 }

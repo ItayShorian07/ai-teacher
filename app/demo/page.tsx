@@ -1,9 +1,9 @@
-import Classroom from '../classroom';
+import Classroom from '@/components/classroom/classroom';
 export const metadata = { title: 'דמו ללא הרשמה | Limud' };
-export default function Demo() {
+export default function DemoPage() {
   return (
     <Classroom
-      demo
+      isDemo
       profile={{
         first_name: 'אורח',
         last_name: '',

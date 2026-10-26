@@ -1,14 +1,14 @@
 'use client';
-import { interests } from '@/lib/interests';
+import { interests } from '@/lib/profile-interests';
 
 export function InterestPicker({
-  lang,
+  language,
   values,
   onChange,
   custom,
   onCustom,
 }: {
-  lang: 'he' | 'en';
+  language: 'he' | 'en';
   values: string[];
   onChange: (v: string[]) => void;
   custom: string;
@@ -17,7 +17,7 @@ export function InterestPicker({
   return (
     <fieldset className="interest-picker">
       <legend>
-        {lang === 'he'
+        {language === 'he'
           ? 'מה מעניין אתכם? (לא חובה)'
           : 'What interests you? (optional)'}
       </legend>
@@ -38,18 +38,20 @@ export function InterestPicker({
               )
             }
           >
-            {lang === 'he' ? he : en}
+            {language === 'he' ? he : en}
           </button>
         ))}
       </div>
       <label className="auth-field">
-        {lang === 'he' ? 'משהו נוסף שאתם אוהבים' : 'Something else you love'}
+        {language === 'he'
+          ? 'משהו נוסף שאתם אוהבים'
+          : 'Something else you love'}
         <input
           value={custom}
           onChange={(e) => onCustom(e.target.value)}
           maxLength={60}
           placeholder={
-            lang === 'he'
+            language === 'he'
               ? 'למשל מיינקראפט, הארי פוטר או K-pop'
               : 'Minecraft, Harry Potter or K-pop'
           }

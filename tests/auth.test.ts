@@ -1,10 +1,10 @@
-import test from 'node:test';
 import assert from 'node:assert/strict';
+import test from 'node:test';
 import {
-  profileSchema,
-  normalizePhone,
-  accountComplete,
+  accountProfileSchema,
   emailSchema,
+  isAccountComplete,
+  normalizePhone,
   otpSchema,
 } from '../lib/auth-validation';
 const profile = {
@@ -34,7 +34,7 @@ test('Israeli phone formats canonicalize without losing international support', 
 });
 test('registration validates required fields and strips whitespace', () => {
   assert.equal(
-    profileSchema.parse({
+    accountProfileSchema.parse({
       ...profile,
       first_name: ' נועה ',
       age: '14',
@@ -57,7 +57,7 @@ test('registration validates required fields and strips whitespace', () => {
     { id: 'another-user' },
   ])
     assert.equal(
-      profileSchema.safeParse({ ...profile, ...invalid }).success,
+      accountProfileSchema.safeParse({ ...profile, ...invalid }).success,
       false,
       JSON.stringify(invalid),
     );
@@ -66,21 +66,21 @@ test('registration validates required fields and strips whitespace', () => {
   assert.equal(otpSchema.safeParse('123456').success, true);
 });
 test('completion requires trusted email and required profile fields in the POC', () => {
-  assert.equal(accountComplete(user, profile), true);
+  assert.equal(isAccountComplete(user, profile), true);
   assert.equal(
-    accountComplete({ ...user, email_confirmed_at: null }, profile),
+    isAccountComplete({ ...user, email_confirmed_at: null }, profile),
     false,
   );
   assert.equal(
-    accountComplete({ ...user, phone_confirmed_at: null }, profile),
+    isAccountComplete({ ...user, phone_confirmed_at: null }, profile),
     true,
   );
   assert.equal(
-    accountComplete({ ...user, phone: '972509999999' }, profile),
+    isAccountComplete({ ...user, phone: '972509999999' }, profile),
     true,
   );
-  assert.equal(accountComplete(user, null), false);
-  assert.equal(accountComplete(user, { ...profile, city: '' }), false);
+  assert.equal(isAccountComplete(user, null), false);
+  assert.equal(isAccountComplete(user, { ...profile, city: '' }), false);
   // Generic confirmation or editable metadata never substitutes for channel verification.
   const spoof = {
     email: user.email,
@@ -92,16 +92,16 @@ test('completion requires trusted email and required profile fields in the POC',
       complete: true,
     },
   };
-  assert.equal(accountComplete(spoof, profile), false);
+  assert.equal(isAccountComplete(spoof, profile), false);
 });
 test('an SMS verification session for another account cannot complete onboarding', () => {
   const changedSession = { ...user, id: 'different-account' };
   assert.equal(
-    accountComplete(changedSession, profile, 'original-account'),
+    isAccountComplete(changedSession, profile, 'original-account'),
     false,
   );
   assert.equal(
-    accountComplete(
+    isAccountComplete(
       { ...user, id: 'original-account' },
       profile,
       'original-account',
@@ -111,10 +111,17 @@ test('an SMS verification session for another account cannot complete onboarding
 });
 
 test('nullable optional hobbies from Postgres do not block a complete account', () => {
-  assert.equal(accountComplete(user, { ...profile, custom_hobby: null }), true);
+  assert.equal(
+    isAccountComplete(user, { ...profile, custom_hobby: null }),
+    true,
+  );
   assert.deepEqual(
-    profileSchema.parse({ ...profile, hobbies: ['music', 'music'] }).hobbies,
+    accountProfileSchema.parse({ ...profile, hobbies: ['music', 'music'] })
+      .hobbies,
     ['music'],
   );
-  assert.equal(accountComplete(user, { ...profile, school: undefined }), false);
+  assert.equal(
+    isAccountComplete(user, { ...profile, school: undefined }),
+    false,
+  );
 });

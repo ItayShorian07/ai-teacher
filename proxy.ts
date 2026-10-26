@@ -1,9 +1,9 @@
+import { getSupabaseConfig, isAuthConfigured } from '@/lib/supabase/config';
 import { createServerClient } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
-import { authConfigured, authConfig } from '@/lib/supabase/config';
 export async function proxy(request: NextRequest) {
-  if (!authConfigured()) return NextResponse.next();
-  const { url, key } = authConfig();
+  if (!isAuthConfigured()) return NextResponse.next();
+  const { url, key } = getSupabaseConfig();
   let response = NextResponse.next({ request });
   const supabase = createServerClient(url, key, {
     cookies: {

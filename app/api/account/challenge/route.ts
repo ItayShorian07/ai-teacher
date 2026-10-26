@@ -1,22 +1,26 @@
-import { cookies } from 'next/headers';
+import { humanVerificationSchema } from '@/lib/auth-validation';
+import { createHumanVerificationToken } from '@/lib/human-verification-token';
+import { getCurrentAccount } from '@/lib/server/account';
 import {
-  currentAccount,
-  privateJson,
-  validOrigin,
-  boundedJson,
-} from '@/lib/account-server';
-import { botConfigured } from '@/lib/learning-access';
-import { signBotPass } from '@/lib/bot-token';
+  isValidOrigin,
+  privateJsonResponse,
+  readJsonBody,
+} from '@/lib/server/http';
+import { isCaptchaConfigured } from '@/lib/server/learning-access';
+import { cookies } from 'next/headers';
 export async function POST(request: Request) {
-  if (!validOrigin(request))
-    return privateJson({ error: 'invalid_origin' }, 403);
-  if (!botConfigured()) return privateJson({ error: 'unavailable' }, 503);
+  if (!isValidOrigin(request))
+    return privateJsonResponse({ error: 'invalid_origin' }, 403);
+  if (!isCaptchaConfigured())
+    return privateJsonResponse({ error: 'unavailable' }, 503);
   try {
-    const account = await currentAccount();
-    if (!account) return privateJson({ error: 'unauthorized' }, 401);
-    const { token } = await boundedJson(request);
-    if (typeof token !== 'string' || !token || token.length > 2048)
-      return privateJson({ error: 'captcha' }, 400);
+    const account = await getCurrentAccount();
+    if (!account) return privateJsonResponse({ error: 'unauthorized' }, 401);
+    const input = humanVerificationSchema.safeParse(
+      await readJsonBody(request),
+    );
+    if (!input.success) return privateJsonResponse({ error: 'captcha' }, 400);
+    const { token } = input.data;
     const secret = process.env.TURNSTILE_SECRET_KEY!;
     const response = await fetch(
       'https://challenges.cloudflare.com/turnstile/v0/siteverify',
@@ -34,16 +38,20 @@ export async function POST(request: Request) {
       result.action !== 'learning' ||
       result.hostname !== new URL(request.headers.get('origin')!).hostname
     )
-      return privateJson({ error: 'captcha' }, 400);
-    (await cookies()).set('limud-human', signBotPass(account.user.id, secret), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 1800,
-    });
-    return privateJson({ verified: true });
+      return privateJsonResponse({ error: 'captcha' }, 400);
+    (await cookies()).set(
+      'limud-human',
+      createHumanVerificationToken(account.user.id, secret),
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 1800,
+      },
+    );
+    return privateJsonResponse({ verified: true });
   } catch {
-    return privateJson({ error: 'captcha' }, 503);
+    return privateJsonResponse({ error: 'captcha' }, 503);
   }
 }

@@ -1,7 +1,7 @@
 'use client';
 import { createBrowserClient } from '@supabase/ssr';
-import { authConfig } from './config';
-export function browserSupabase() {
-  const { url, key } = authConfig();
+import { getSupabaseConfig } from './config';
+export function createBrowserSupabaseClient() {
+  const { url, key } = getSupabaseConfig();
   return createBrowserClient(url, key);
 }

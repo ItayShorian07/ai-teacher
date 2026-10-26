@@ -1,19 +1,21 @@
-import { currentAccount, privateJson } from '@/lib/account-server';
-import { authConfigured } from '@/lib/supabase/config';
-import { accountComplete } from '@/lib/auth-validation';
+import { isAccountComplete } from '@/lib/auth-validation';
+import { getCurrentAccount } from '@/lib/server/account';
+import { privateJsonResponse } from '@/lib/server/http';
+import { isAuthConfigured } from '@/lib/supabase/config';
 export async function GET() {
-  if (!authConfigured())
-    return privateJson({ configured: false, signedIn: false });
+  if (!isAuthConfigured())
+    return privateJsonResponse({ configured: false, signedIn: false });
   try {
-    const account = await currentAccount();
-    if (!account) return privateJson({ configured: true, signedIn: false });
-    return privateJson({
+    const account = await getCurrentAccount();
+    if (!account)
+      return privateJsonResponse({ configured: true, signedIn: false });
+    return privateJsonResponse({
       configured: true,
       signedIn: true,
-      complete: accountComplete(account.user, account.profile),
+      complete: isAccountComplete(account.user, account.profile),
       firstName: account.profile?.first_name || '',
     });
   } catch {
-    return privateJson({ error: 'unavailable' }, 503);
+    return privateJsonResponse({ error: 'unavailable' }, 503);
   }
 }

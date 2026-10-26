@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import ThemeToggle from '@/components/theme-toggle';
+import Link from 'next/link';
 export const metadata = { title: 'יצירת קשר ועזרה | Limud' };
-export default function Contact() {
+export default function ContactPage() {
   return (
     <main id="main-content" className="help-page" dir="rtl">
       <header>

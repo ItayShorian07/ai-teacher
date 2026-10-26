@@ -5,52 +5,34 @@ export function normalizePhone(value: string): string {
   if (/^9725\d{8}$/.test(clean)) return `+${clean}`;
   return clean;
 }
-const name = z
-  .string()
-  .trim()
-  .min(1)
-  .max(60)
-  .regex(/^[^\p{Cc}<>]+$/u);
-const hobbyItem = z
-  .string()
-  .trim()
-  .min(1)
-  .max(60)
-  .regex(/^[^\p{Cc}<>]+$/u);
+function profileText(maxLength: number, minLength = 1) {
+  return z
+    .string()
+    .trim()
+    .min(minLength)
+    .max(maxLength)
+    .regex(/^[^\p{Cc}<>]*$/u);
+}
 
-export const profileSchema = z
+export const accountProfileSchema = z
   .object({
-    first_name: name,
-    last_name: name,
-    city: z
-      .string()
-      .trim()
-      .min(2)
-      .max(100)
-      .regex(/^[^\p{Cc}<>]+$/u),
+    first_name: profileText(60),
+    last_name: profileText(60),
+    city: profileText(100, 2),
     age: z.coerce.number().int().min(1).max(120),
     phone: z
       .string()
       .transform(normalizePhone)
       .pipe(z.string().regex(/^\+[1-9]\d{7,14}$/)),
     locale: z.enum(['he', 'en']),
-    school: z
-      .string()
-      .trim()
-      .min(2)
-      .max(120)
-      .regex(/^[^\p{Cc}<>]+$/u),
+    school: profileText(120, 2),
     hobbies: z
-      .array(hobbyItem)
+      .array(profileText(60))
       .max(20)
       .optional()
       .default([])
       .transform((items) => [...new Set(items)]),
-    custom_hobby: z
-      .string()
-      .trim()
-      .max(60)
-      .regex(/^[^\p{Cc}<>]*$/u)
+    custom_hobby: profileText(60, 0)
       .nullish()
       .transform((value) => value ?? ''),
   })
@@ -61,7 +43,13 @@ export const otpSchema = z
   .string()
   .trim()
   .regex(/^\d{6,10}$/);
-export type AccountProfile = z.infer<typeof profileSchema>;
+export const humanVerificationSchema = z
+  .object({ token: z.string().min(1).max(2048) })
+  .strict();
+export const accountDeletionSchema = z
+  .object({ confirmation: z.literal('DELETE') })
+  .strict();
+export type AccountProfile = z.infer<typeof accountProfileSchema>;
 export type VerifiedIdentity = {
   id?: string;
   email?: string | null;
@@ -70,27 +58,29 @@ export type VerifiedIdentity = {
   phone_confirmed_at?: string | null;
 };
 
-export function accountComplete(
+export function isAccountComplete(
   user: VerifiedIdentity,
   profile: unknown,
   expectedUserId?: string,
 ): boolean {
   if (expectedUserId && user.id !== expectedUserId) return false;
-  const parsed = profileSchema.safeParse(profile);
+  const parsed = accountProfileSchema.safeParse(profile);
   // POC uses verified email. Phone is a required contact field, not claimed verified.
   return parsed.success && !!user.email && !!user.email_confirmed_at;
 }
 
-export function authErrorCode(error: unknown): string {
-  const e = error as { status?: number; code?: string };
-  if (e?.status === 429 || e?.code?.includes('rate_limit')) return 'rate_limit';
-  if (e?.code === 'otp_expired' || e?.code === 'otp_disabled')
-    return 'invalid_code';
-  if (e?.code?.includes('captcha')) return 'captcha';
+export function getAuthErrorCode(error: unknown): string {
+  if (!error || typeof error !== 'object') return 'unavailable';
+  const status = 'status' in error ? error.status : undefined;
+  const code =
+    'code' in error && typeof error.code === 'string' ? error.code : '';
+  if (status === 429 || code.includes('rate_limit')) return 'rate_limit';
+  if (code === 'otp_expired' || code === 'otp_disabled') return 'invalid_code';
+  if (code.includes('captcha')) return 'captcha';
   return 'unavailable';
 }
 
-export function phoneVerified(
+export function isPhoneVerified(
   user: VerifiedIdentity,
   phone: string,
   expectedUserId?: string,

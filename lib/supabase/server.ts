@@ -1,9 +1,9 @@
-import 'server-only';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { authConfig } from './config';
-export async function serverSupabase() {
-  const { url, key } = authConfig();
+import 'server-only';
+import { getSupabaseConfig } from './config';
+export async function createServerSupabaseClient() {
+  const { url, key } = getSupabaseConfig();
   const jar = await cookies();
   return createServerClient(url, key, {
     cookies: {

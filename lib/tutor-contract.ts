@@ -1,5 +1,5 @@
 import { z } from 'zod';
-export const questionSchema = z.object({
+export const generatedQuestionSchema = z.object({
   prompt: z.string().min(1).max(3000),
   expression: z.string().min(1).max(4000),
   answer: z.string().min(1).max(4000),
@@ -8,12 +8,12 @@ export const questionSchema = z.object({
   recovery: z.string().min(1).max(2000),
   recoveryAnswer: z.string().min(1).max(2000),
 });
-export const feedbackSchema = z.object({
+export const tutorFeedbackSchema = z.object({
   status: z.enum(['correct', 'mistake', 'partial', 'continue']),
   feedback: z.string().min(1).max(3000),
   prerequisite: z.string().max(2000).optional(),
 });
-export const tutorSchema = z
+export const tutorRequestSchema = z
   .object({
     action: z.enum(['story', 'question', 'check', 'coach', 'recover']),
     lang: z.enum(['he', 'en']),
@@ -30,12 +30,36 @@ export const tutorSchema = z
     final: z.boolean().optional(),
   })
   .strict();
-export type TutorInput = z.infer<typeof tutorSchema>;
+export type TutorInput = z.infer<typeof tutorRequestSchema>;
+
+export const publicQuestionSchema = generatedQuestionSchema.pick({
+  prompt: true,
+  expression: true,
+  hint: true,
+  recovery: true,
+});
+export const storyResponseSchema = z.object({
+  text: z.string().min(1),
+  sources: z.array(z.string()),
+  cached: z.boolean(),
+});
+export const questionResponseSchema = z.object({
+  questionId: z.string().uuid(),
+  question: publicQuestionSchema,
+  sources: z.array(z.string()),
+  cached: z.boolean(),
+});
+export const transcriptionResponseSchema = z.object({
+  text: z.string().max(8000),
+});
+export type TutorFeedback = z.infer<typeof tutorFeedbackSchema>;
+export type StoryResponse = z.infer<typeof storyResponseSchema>;
+export type QuestionResponse = z.infer<typeof questionResponseSchema>;
 export const MAX_PDF_BYTES = 3 * 1024 * 1024;
-export function validPdf(bytes: Uint8Array) {
+export function isValidPdf(bytes: Uint8Array) {
   return (
     bytes.length > 5 &&
     bytes.length <= MAX_PDF_BYTES &&
-    Buffer.from(bytes.subarray(0, 5)).toString() === '%PDF-'
+    new TextDecoder().decode(bytes.subarray(0, 5)) === '%PDF-'
   );
 }

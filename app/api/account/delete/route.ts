@@ -1,26 +1,27 @@
+import { accountDeletionSchema } from '@/lib/auth-validation';
+import { getCurrentAccount } from '@/lib/server/account';
 import {
-  currentAccount,
-  privateJson,
-  validOrigin,
-  boundedJson,
-} from '@/lib/account-server';
-import { adminSupabase } from '@/lib/supabase/admin';
+  isValidOrigin,
+  privateJsonResponse,
+  readJsonBody,
+} from '@/lib/server/http';
+import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 export async function POST(request: Request) {
-  if (!validOrigin(request))
-    return privateJson({ error: 'invalid_origin' }, 403);
+  if (!isValidOrigin(request))
+    return privateJsonResponse({ error: 'invalid_origin' }, 403);
   try {
-    const account = await currentAccount();
-    if (!account) return privateJson({ error: 'unauthorized' }, 401);
-    const body = await boundedJson(request);
-    if (body.confirmation !== 'DELETE')
-      return privateJson({ error: 'confirmation_required' }, 400);
-    const { error } = await adminSupabase().auth.admin.deleteUser(
+    const account = await getCurrentAccount();
+    if (!account) return privateJsonResponse({ error: 'unauthorized' }, 401);
+    const input = accountDeletionSchema.safeParse(await readJsonBody(request));
+    if (!input.success)
+      return privateJsonResponse({ error: 'confirmation_required' }, 400);
+    const { error } = await createAdminSupabaseClient().auth.admin.deleteUser(
       account.user.id,
     );
-    if (error) return privateJson({ error: 'delete_unavailable' }, 503);
+    if (error) return privateJsonResponse({ error: 'delete_unavailable' }, 503);
     await account.supabase.auth.signOut({ scope: 'local' });
-    return privateJson({ deleted: true });
+    return privateJsonResponse({ deleted: true });
   } catch {
-    return privateJson({ error: 'delete_unavailable' }, 503);
+    return privateJsonResponse({ error: 'delete_unavailable' }, 503);
   }
 }
