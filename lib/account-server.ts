@@ -14,10 +14,8 @@ export async function currentAccount(){
 }
 export function validOrigin(request:Request){
  const origin=request.headers.get('origin');
- if(origin===siteOrigin())return true;
  try{
-  const client=new URL(origin||'');const target=new URL(request.url);const loopback=['localhost','127.0.0.1'];
-  return process.env.NODE_ENV==='development'&&client.protocol==='http:'&&target.protocol==='http:'&&loopback.includes(client.hostname)&&loopback.includes(target.hostname)&&client.port===target.port;
+  return Boolean(origin)&&new URL(origin!).origin===siteOrigin(new URL(request.url).origin);
  }catch{return false;}
 }
 export async function boundedJson(request:Request,limit=8192){

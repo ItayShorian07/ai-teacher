@@ -16,13 +16,15 @@ A persistent light/dark switch is available in the authentication and classroom 
 
 Use `npm run check:connections` for current configuration and database checks. Credentials belong in the ignored `.env.local` file and the hosting environment, never in `.env.example`. A successful configuration check does not replace end-to-end verification of email delivery, OAuth, data isolation or deletion. The site disables auth controls when the required profile schema or Turnstile configuration is unavailable.
 
-Read the full [implementation and connection report in Hebrew](docs/IMPLEMENTATION_STATUS.he.md). It maps every requested feature, explains bot protection and lists exact activation steps and limitations.
+Read the full [implementation and connection report in Hebrew](docs/IMPLEMENTATION_STATUS.he.md). It maps every requested feature, explains bot protection and lists exact activation steps and limitations. The [development workflow](docs/DEVELOPMENT_WORKFLOW.he.md) describes the isolated Local, Preview and Production environments.
 
-The live check on 2026-10-20 returned `configured:false`. The current login blocker is deployment configuration, not the absence of a login page. See the updated [account activation guide and missing-features list](docs/ACCOUNTS_SETUP.he.md).
+See the [account activation guide and missing-features list](docs/ACCOUNTS_SETUP.he.md) for provider setup and end-to-end verification.
 
 ## Setup
 
 Use Node 22 or newer. Install with `npm ci`, configure `.env.local` using `.env.example`, and run `npm run dev`.
+
+`main` deploys to Production. Short-lived branches deploy to Vercel Preview and are merged through a pull request after validation. Local and Preview use a separate Supabase Development project; Production uses the existing production project. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Apply [`database/setup.sql`](database/setup.sql) in Supabase SQL Editor. **One Supabase Postgres database is enough**, with pgvector collections for approved material, question/rubric data and generated-content caching. No additional vector database service is required.
 

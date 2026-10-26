@@ -1,8 +1,14 @@
 import nextEnv from '@next/env';
 const { loadEnvConfig } = nextEnv;
 loadEnvConfig(process.cwd());
-const names=['NEXT_PUBLIC_SUPABASE_URL','NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY','SUPABASE_SERVICE_ROLE_KEY','GEMINI_API_KEY','NEXT_PUBLIC_TURNSTILE_SITE_KEY','TURNSTILE_SECRET_KEY'];
+const names=['NEXT_PUBLIC_APP_ENV','NEXT_PUBLIC_SUPABASE_ENV','NEXT_PUBLIC_SUPABASE_URL','NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY','SUPABASE_SERVICE_ROLE_KEY','GEMINI_API_KEY','NEXT_PUBLIC_TURNSTILE_SITE_KEY','TURNSTILE_SECRET_KEY'];
 for(const name of names){console.log(`${name}: ${process.env[name]?'configured':'missing'}`);if(!process.env[name])process.exitCode=1;}
+const appEnvironment=process.env.NEXT_PUBLIC_APP_ENV,dataEnvironment=process.env.NEXT_PUBLIC_SUPABASE_ENV;
+const validApp=['development','preview','production'].includes(appEnvironment);
+const validData=['development','production'].includes(dataEnvironment);
+const environmentMatches=validApp&&validData&&((appEnvironment==='production')===(dataEnvironment==='production'));
+console.log('environment isolation:',environmentMatches?'valid':'invalid');
+if(!environmentMatches)process.exit(1);
 const url=process.env.NEXT_PUBLIC_SUPABASE_URL, key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 if(!url||!key)process.exit(1);
 for(const path of ['/auth/v1/settings','/rest/v1/profiles?select=id,username,school,hobbies,custom_hobby&limit=0','/rest/v1/material_chunks?select=id&limit=0','/rest/v1/question_items?select=id&limit=0','/rest/v1/learning_cache?select=id&limit=0','/rest/v1/learning_questions?select=id&limit=0','/rest/v1/ai_quota?select=user_id&limit=0','/rest/v1/entitlements?select=user_id&limit=0']){
