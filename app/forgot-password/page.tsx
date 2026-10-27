@@ -1,7 +1,8 @@
 import PasswordResetForm from '@/components/auth/password-reset-form';
 import { getAuthReadiness } from '@/lib/server/auth-readiness';
+import { pageTitle } from '@/lib/site-metadata';
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'איפוס סיסמה · Reset password | Limud' };
+export const metadata = { title: pageTitle('איפוס סיסמה · Reset password') };
 export default async function ForgotPasswordPage({
   searchParams,
 }: {

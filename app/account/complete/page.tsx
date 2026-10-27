@@ -1,10 +1,11 @@
 import ProfileForm from '@/components/auth/profile-form';
 import { isAccountComplete } from '@/lib/auth-validation';
 import { getCurrentAccount } from '@/lib/server/account';
+import { pageTitle } from '@/lib/site-metadata';
 import { redirect } from 'next/navigation';
 export const dynamic = 'force-dynamic';
 export const metadata = {
-  title: 'השלמת הרשמה · Complete your account | Limud',
+  title: pageTitle('השלמת הרשמה · Complete your account'),
 };
 export default async function CompleteProfilePage({
   searchParams,

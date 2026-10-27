@@ -16,17 +16,39 @@
 
 ## מצב ההקמה
 
-המאגר כולל בדיקות תצורה, כללי עבודה ו־CI. הגדרת הסביבות בשירותים אינה נוצרת מהקבצים האלה. לפני בדיקת הרשמה צריך להשלים את החיבורים הבאים:
+בעל הפרויקט יצר פרויקט Supabase נוסף וסביבת פיתוח ב־Vercel. שתי הסביבות רשומות ב־`config/environments.json`, עם שמות קריאים: **Limud** ו־**Limud Dev**.
 
-1. לזהות איזה פרויקט Supabase מחובר לאתר הקיים ולהחליט שהוא פרויקט production. לא מסיקים זאת רק מכך שמפתח נמצא ב־`.env.local`. ליצור פרויקט פיתוח נפרד באותה ארכיטקטורה, לאחר בדיקת העלות בחשבון.
-2. למלא ב־`config/environments.json` את `nonProductionSupabaseUrl` ואת `productionSupabaseUrl`. אלה כתובות ציבוריות, ללא מפתחות. `productionSiteUrl` מכיל את כתובת הפריסה המתועדת כיום ויש לעדכן אותו אם הדומיין משתנה. הערכים הריקים מכוונים: חיבור לשירותים ייחסם עד שיוגדר לאיזו סביבה הוא שייך.
-3. לעדכן את `.env.local` במפתחות **של פרויקט הפיתוח בלבד**, עם `APP_ENV=development` ו־`NEXT_PUBLIC_SITE_URL=http://127.0.0.1:3000`. בהפעלה בפורט אחר לעדכן גם את הכתובת. לא לדרוס או להעתיק אוטומטית סודות קיימים. אפשר להריץ את הדמו בלי חיבורים באמצעות השארת כל משתני השירותים ריקים.
-4. ב־Vercel לוודא שהפרויקט מחובר למאגר הנכון וש־Production Branch הוא `main`. ב־Preview להגדיר מפתחות פיתוח בלבד ו־`APP_ENV=preview`. ב־Production להגדיר מפתחות production ו־`APP_ENV=production`. אם מפעילים גם Vercel Development, להגדיר בו את ערכי הפיתוח. לא לסמן סודות production כמשותפים לכל הסביבות.
-5. ב־Preview להשאיר את `NEXT_PUBLIC_SITE_URL` לא מוגדר. הקוד משתמש ב־`VERCEL_BRANCH_URL`, או ב־`VERCEL_URL` כשאין כתובת ענף. ב־Production להגדיר במפורש את הכתובת הרשומה ב־`productionSiteUrl`. לאחר שינוי משתני סביבה לבנות ולפרוס מחדש; ערכי `NEXT_PUBLIC_*` נקבעים בזמן build.
-6. להחיל את `database/setup.sql` על פרויקט הפיתוח החדש בלבד, ולהגדיר בו SMTP, OTP, CAPTCHA ו־Google לפי הצורך. הגדרות Auth אינן מועתקות אוטומטית בין פרויקטים. לבדוק תחילה מה כבר הוחל בפרויקט production ולא להריץ שם bootstrap בעיוורון.
-7. ב־Supabase של הפיתוח להגדיר redirect URLs ל־`http://127.0.0.1:3000/auth/callback`, ל־localhost אם משתמשים בו, ולכתובות Preview שבשליטת הפרויקט. בפרויקט production לאפשר את כתובת production בלבד. ב־Google OAuth להגדיר לכל פרויקט את callback של Supabase שלו. ב־Turnstile להשתמש ב־widget ומפתחות נפרדים לפיתוח ול־production, ולאפשר את ה־hostnames המתאימים. לא להשתמש במפתחות בדיקה ב־production.
-8. ליצור מפתח Gemini נפרד לפיתוח, עם מגבלת שימוש מתאימה. לא להעתיק משתמשים או פרטים אישיים מ־production. להתחיל בשני חשבונות בדיקה ובחומר לימודי בדוי או מאושר.
-9. ב־GitHub להגדיר הגנה על `main`: מיזוג דרך Pull Request, בדיקת `validate` נדרשת, חסימת force push ומחיקת הענף, והחלת הכללים גם על מנהל המאגר ככל שהמסלול מאפשר. כמפתח יחיד אין צורך לחייב אישור של אדם נוסף. קובץ ה־CI לבדו אינו מפעיל הגנה על ענפים.
+| הגדרה | Limud Dev | Limud |
+| --- | --- | --- |
+| Supabase | `https://rviepntsesloohctatao.supabase.co` | `https://ztdtnpujhubgypqcvafu.supabase.co` |
+| אתר נוכחי | [פיתוח](https://ai-teacher-git-codex-environment-50cd59-itayshorian07s-projects.vercel.app/) | [האתר הראשי](https://ai-teacher-three-pied.vercel.app/) |
+| מקור הזיהוי | כתובת שמסר בעל הפרויקט | הכתובת המוטמעת בקוד הציבורי של האתר החי |
+
+כתובת הפיתוח הנוכחית מוגנת בכניסה של Vercel. שינוי דומיינים לשמות קצרים מחייב גישה לחשבון, בדיקת זמינות והוספת הכתובות ל־Supabase ול־Turnstile. שם הדפדפן כבר נקבע לפי הסביבה; שם זה אינו משנה את הדומיין ב־Vercel.
+
+### משתנים לפי סביבה
+
+| משתנה | Local | Vercel Preview | Vercel Production |
+| --- | --- | --- | --- |
+| `NEXT_PUBLIC_APP_ENV` | `development` | `preview` | `production` |
+| `NEXT_PUBLIC_SUPABASE_ENV` | `development` | `development` | `production` |
+| `NEXT_PUBLIC_SUPABASE_URL` | פרויקט הפיתוח | פרויקט הפיתוח | פרויקט production |
+| `NEXT_PUBLIC_SITE_URL` | `http://127.0.0.1:3000` | לא מוגדר, או כתובת הפיתוח המחוברת לפריסה | כתובת האתר הראשי הרשומה |
+
+הקוד תומך גם בתווית `development` ב־`NEXT_PUBLIC_APP_ENV` של Vercel Preview. הוא מזהה את סוג הפריסה מתוך `VERCEL_ENV`, ומחייב נתוני פיתוח. `APP_ENV` הישן נתמך לתאימות, אך אינו נדרש כשמשתמשים במשתנים הציבוריים. תוויות סותרות נחסמות.
+
+המשתנים `NEXT_PUBLIC_*` נשלחים לדפדפן. `SUPABASE_SERVICE_ROLE_KEY`, `TURNSTILE_SECRET_KEY` ו־`GEMINI_API_KEY` נשארים בשרת ומוגדרים כסודות ב־Vercel. מפתחות כל סביבה שייכים לפרויקט שלה. שינוי משתנים ציבוריים מחייב build ופריסה חדשים.
+
+לפני בדיקת הרשמה:
+
+1. לוודא שב־Preview נמצאים מפתחות פרויקט הפיתוח וב־Production מפתחות הפרויקט הראשי. הבדיקות חוסמות גם כתובת של פרויקט שלישי, אפילו אם התווית שלו היא `development`.
+2. לסנכרן סודות פיתוח אל `.env.local` לפי `.env.example`. הקובץ המקומי הקודם לא הוחלף: הוא מכיל כתובת של פרויקט ישן שלא תואמת לשתי הסביבות הפעילות. אין לשלב מפתח ישן עם כתובת הפרויקט החדש.
+3. לוודא ש־`database/setup.sql` הוחל על פרויקט הפיתוח החדש, ושהוגדרו בו SMTP, אימות מייל, CAPTCHA ו־Google לפי הצורך. הגדרות אלו אינן נוצרות משינוי קבצי הקוד. הוראות החשבונות נמצאות ב־[ACCOUNTS_SETUP.he.md](ACCOUNTS_SETUP.he.md).
+4. ב־Supabase של הפיתוח לאפשר את כתובות ה־callback של localhost ושל כתובת Preview שבודקים. בפרויקט production לאפשר רק את האתר הראשי. בעת שינוי דומיין לעדכן גם את רשימת ההפניות וגם את ה־hostnames ב־Turnstile.
+5. להשתמש במפתחות Turnstile נפרדים לכל סביבה. מפתחות הבדיקה הרשמיים חסומים ב־production. לצורך בדיקת למידה מלאה משתמשים ב־widget פיתוח תקין, מפני שאימות השרת בודק גם hostname ו־action.
+6. להתחיל בשני חשבונות בדיקה ובחומר לימוד בדוי או מאושר. לפני מיזוג בודקים גם בידוד פרופילים ושחזור סיסמה.
+
+ב־GitHub מגדירים הגנה על `main`: Pull Request, בדיקת `validate` נדרשת, וחסימת force push ומחיקת הענף. כמפתח יחיד אין צורך לחייב אישור של אדם נוסף. קובץ ה־CI אינו מפעיל הגנת ענפים בעצמו.
 
 `npm run check:env` בודק את תצורת ה־build שנקראת דרך Next.js. עבור סדר טעינת הקבצים של שרת הפיתוח: `npm run check:env -- --development`. בדיקה זו אינה מתחברת לספקים ואינה מוכיחה שהמפתחות, SMTP או CAPTCHA עובדים. `npm run check:connections` מבצע בדיקות קריאה מול הפרויקט שהוגדר, אחרי שבדיקת הסביבה עברה.
 

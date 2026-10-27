@@ -6,9 +6,10 @@ import {
   hasProAccess,
   isCaptchaConfigured,
 } from '@/lib/server/learning-access';
+import { pageTitle } from '@/lib/site-metadata';
 import { redirect } from 'next/navigation';
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'הכיתה שלי · My classroom | Limud' };
+export const metadata = { title: pageTitle('הכיתה שלי · My classroom') };
 export default async function ClassroomPage() {
   const account = await getCurrentAccount();
   if (!account) redirect('/login');

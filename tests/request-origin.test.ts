@@ -32,6 +32,26 @@ test('preview accepts its trusted branch and deployment aliases', () => {
   }
 });
 
+test('public Vercel aliases also return callbacks to the active preview', () => {
+  const env = {
+    NEXT_PUBLIC_APP_ENV: 'preview',
+    NEXT_PUBLIC_VERCEL_BRANCH_URL: 'branch.example.com',
+    NEXT_PUBLIC_VERCEL_URL: 'deployment.example.com',
+  };
+  assert.equal(
+    validRequestOrigin(request('https://deployment.example.com'), env),
+    true,
+  );
+  assert.equal(
+    callbackOrigin('https://deployment.example.com/auth/callback', env),
+    'https://deployment.example.com',
+  );
+  assert.equal(
+    validRequestOrigin(request('https://other.example.com'), env),
+    false,
+  );
+});
+
 test('preview rejects production, other branches and forged origins', () => {
   for (const origin of [
     undefined,

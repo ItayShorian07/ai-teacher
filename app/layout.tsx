@@ -1,7 +1,9 @@
+import { applicationName } from '@/lib/site-metadata';
 import type { Metadata } from 'next';
 import './globals.css';
 export const metadata: Metadata = {
-  title: 'Limud · Your way to understand',
+  title: `${applicationName} · Your way to understand`,
+  applicationName,
   description:
     'A personal learning space for mathematics, computer science, and learning with AI. בעברית ובאנגלית.',
   icons: { icon: '/favicon.svg' },

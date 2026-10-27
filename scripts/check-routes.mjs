@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 const base = process.env.BASE_URL || 'http://127.0.0.1:3100';
 const origin = process.env.TEST_ORIGIN || base;
+const expectedSiteName = process.env.EXPECTED_SITE_NAME;
 for (const [path, status, expected, redirectTo = '/login'] of [
   ['/', 200, 'טוב שחזרתם'],
   ['/demo', 200, 'אתם בדמו'],
@@ -27,6 +28,10 @@ for (const [path, status, expected, redirectTo = '/login'] of [
     assert.ok(!html.includes('class="app-shell"'), `${path}: leaked classroom`);
   } else assert.equal(r.status, status, path);
   if (expected) assert.ok(html.includes(expected), path);
+  if (expectedSiteName && status === 200) {
+    const title = html.match(/<title>(.*?)<\/title>/s)?.[1];
+    assert.ok(title?.includes(expectedSiteName), `${path}: wrong site name`);
+  }
   assert.equal(r.headers.get('x-content-type-options'), 'nosniff');
   console.log(path, 'OK', r.status);
 }

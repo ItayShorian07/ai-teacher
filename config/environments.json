@@ -1,5 +1,10 @@
 {
-  "nonProductionSupabaseUrl": "",
-  "productionSupabaseUrl": "",
-  "productionSiteUrl": "https://ai-teacher-three-pied.vercel.app"
+  "nonProductionSupabaseUrl": "https://rviepntsesloohctatao.supabase.co",
+  "productionSupabaseUrl": "https://ztdtnpujhubgypqcvafu.supabase.co",
+  "developmentSiteUrl": "https://ai-teacher-git-codex-environment-50cd59-itayshorian07s-projects.vercel.app",
+  "productionSiteUrl": "https://ai-teacher-three-pied.vercel.app",
+  "siteNames": {
+    "development": "Limud Dev",
+    "production": "Limud"
+  }
 }

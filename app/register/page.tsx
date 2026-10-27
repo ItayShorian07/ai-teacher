@@ -1,7 +1,8 @@
 import AuthForm from '@/components/auth/auth-form';
 import { getAuthReadiness } from '@/lib/server/auth-readiness';
+import { pageTitle } from '@/lib/site-metadata';
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'הרשמה · Create account | Limud' };
+export const metadata = { title: pageTitle('הרשמה · Create account') };
 export default async function RegistrationPage({
   searchParams,
 }: {

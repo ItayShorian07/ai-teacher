@@ -1,5 +1,6 @@
 import Classroom from '@/components/classroom/classroom';
-export const metadata = { title: 'דמו ללא הרשמה | Limud' };
+import { pageTitle } from '@/lib/site-metadata';
+export const metadata = { title: pageTitle('דמו ללא הרשמה') };
 export default function DemoPage() {
   return (
     <Classroom

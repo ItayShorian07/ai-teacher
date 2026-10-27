@@ -14,11 +14,11 @@ A persistent light/dark switch is available in the authentication and classroom 
 
 ## Development workflow
 
-Read the [working agreement and environment setup (Hebrew)](docs/WORKFLOW.he.md) before testing registration. Local development and Vercel Preview use a non-production Supabase project; production uses a separate project. Register their public URLs in [`config/environments.json`](config/environments.json). Unregistered or mismatched service environments fail at startup and build time.
+Read the [working agreement and environment setup (Hebrew)](docs/WORKFLOW.he.md) before testing registration. **Limud Dev** uses the development Supabase project; **Limud** uses the separate production project. Their public URLs and site names are registered in [`config/environments.json`](config/environments.json). Unregistered or mismatched service environments fail at startup, build time and client creation.
 
 The [code structure guide (Hebrew)](docs/CODE_STRUCTURE.he.md) explains component boundaries, server services and naming conventions.
 
-Work on short feature branches and merge pull requests into `main` after CI and Preview checks. The repository includes CI and a PR template; Vercel environment settings and GitHub branch protection still need to be configured in their dashboards.
+Work on short feature branches and merge pull requests into `main` after CI and Preview checks. The repository includes CI and a PR template. Provider settings and GitHub branch protection are managed in their dashboards. Changing a site name in this repository updates browser titles; assigning a shorter domain also requires a change in Vercel and the auth provider allowlists.
 
 ## Current connection status
 

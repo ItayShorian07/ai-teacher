@@ -8,7 +8,12 @@ function trustedOrigins(env: EnvironmentValues): Set<string> {
   const origins = new Set([resolveSiteOrigin(env)]);
 
   if (appEnvironment(env) === 'preview') {
-    for (const hostname of [env.VERCEL_BRANCH_URL, env.VERCEL_URL]) {
+    for (const hostname of [
+      env.VERCEL_BRANCH_URL,
+      env.VERCEL_URL,
+      env.NEXT_PUBLIC_VERCEL_BRANCH_URL,
+      env.NEXT_PUBLIC_VERCEL_URL,
+    ]) {
       if (hostname) {
         origins.add(
           resolveSiteOrigin({
