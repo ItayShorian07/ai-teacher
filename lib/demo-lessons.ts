@@ -1,11 +1,13 @@
 import { bilingualText, type Language, type LocalizedText } from './i18n';
 export type Subject = 'math' | 'cs' | 'ai';
 export type SchoolStage = 'primary' | 'middle' | 'high';
-export type Hobby = 'football' | 'gaming' | 'music' | 'space';
+export type SchoolGrade = number;
+export type Hobby =
+  'football' | 'basketball' | 'fortnite' | 'gaming' | 'music' | 'space';
 export type LearningPreferences = {
   lang: Language;
   subject: Subject;
-  stage: SchoolStage;
+  grade: SchoolGrade;
   hobby: Hobby;
 };
 export const subjects = {
@@ -13,17 +15,39 @@ export const subjects = {
   cs: bilingualText('Computer science', 'מדעי המחשב'),
   ai: bilingualText('Learning with AI', 'ללמוד עם AI'),
 };
-export const stages = {
-  primary: bilingualText('Primary · Grades 4–6', 'יסודי · כיתות ד׳–ו׳'),
-  middle: bilingualText('Middle · Grades 7–9', 'חטיבה · כיתות ז׳–ט׳'),
-  high: bilingualText('High · Grades 10–12', 'תיכון · כיתות י׳–י״ב'),
+export const gradeNames: Record<number, LocalizedText> = {
+  1: bilingualText('Grade 1', 'כיתה א׳'),
+  2: bilingualText('Grade 2', 'כיתה ב׳'),
+  3: bilingualText('Grade 3', 'כיתה ג׳'),
+  4: bilingualText('Grade 4', 'כיתה ד׳'),
+  5: bilingualText('Grade 5', 'כיתה ה׳'),
+  6: bilingualText('Grade 6', 'כיתה ו׳'),
+  7: bilingualText('Grade 7', 'כיתה ז׳'),
+  8: bilingualText('Grade 8', 'כיתה ח׳'),
+  9: bilingualText('Grade 9', 'כיתה ט׳'),
+  10: bilingualText('Grade 10', 'כיתה י׳'),
+  11: bilingualText('Grade 11', 'כיתה י״א'),
+  12: bilingualText('Grade 12', 'כיתה י״ב'),
 };
 export const hobbies = {
   football: bilingualText('Football', 'כדורגל'),
+  basketball: bilingualText('Basketball', 'כדורסל'),
+  fortnite: bilingualText('Fortnite', 'פורטנייט'),
   gaming: bilingualText('Gaming', 'גיימינג'),
   music: bilingualText('Music', 'מוזיקה'),
   space: bilingualText('Space', 'חלל'),
 };
+
+export function getSchoolStage(grade: SchoolGrade): SchoolStage {
+  if (grade <= 6) return 'primary';
+  if (grade <= 9) return 'middle';
+  return 'high';
+}
+
+function getHobbyLabel(hobby: Hobby, customHobby = ''): LocalizedText {
+  const custom = customHobby.trim();
+  return custom ? bilingualText(custom, custom) : hobbies[hobby];
+}
 export type PracticeQuestion = {
   id: string;
   title: LocalizedText;
@@ -42,35 +66,48 @@ export type PracticeQuestion = {
 export function getLessonTopic(
   preferences: LearningPreferences,
 ): LocalizedText {
+  const stage = getSchoolStage(preferences.grade);
   if (preferences.subject === 'ai')
     return bilingualText(
       'Think first. Ask better.',
       'חושבים קודם. שואלים טוב יותר.',
     );
-  if (preferences.subject === 'cs')
-    return preferences.stage === 'primary'
-      ? bilingualText('Patterns & instructions', 'תבניות והוראות')
-      : preferences.stage === 'middle'
-        ? bilingualText('Loops & variables', 'לולאות ומשתנים')
-        : bilingualText('Recursion, step by step', 'רקורסיה, צעד אחר צעד');
-  return preferences.stage === 'primary'
-    ? bilingualText('Multiplication in the real world', 'כפל בעולם האמיתי')
-    : preferences.stage === 'middle'
-      ? bilingualText('Making sense of equations', 'מבינים משוואות')
-      : bilingualText(
-          'Exploring quadratic equations',
-          'מגלים משוואות ריבועיות',
-        );
+  if (preferences.subject === 'cs') {
+    if (preferences.grade <= 3)
+      return bilingualText('Patterns & instructions', 'תבניות והוראות');
+    if (preferences.grade <= 6)
+      return bilingualText('Loops & repetition', 'לולאות וחזרות');
+    if (stage === 'middle')
+      return bilingualText('Loops & variables', 'לולאות ומשתנים');
+    return bilingualText('Recursion, step by step', 'רקורסיה, צעד אחר צעד');
+  }
+  if (preferences.grade <= 2)
+    return bilingualText('Addition and subtraction', 'חיבור וחיסור');
+  if (preferences.grade <= 4)
+    return bilingualText(
+      'Multiplication in the real world',
+      'כפל בעולם האמיתי',
+    );
+  if (preferences.grade <= 6)
+    return bilingualText('Fractions you can see', 'שברים שאפשר לראות');
+  if (stage === 'middle')
+    return bilingualText('Making sense of equations', 'מבינים משוואות');
+  return bilingualText(
+    'Exploring quadratic equations',
+    'מגלים משוואות ריבועיות',
+  );
 }
 export function createDemoQuestion(
   preferences: LearningPreferences,
   level = 1,
   variant = 0,
+  customHobby = '',
 ): PracticeQuestion {
+  const stage = getSchoolStage(preferences.grade);
   const variantOffset = variant % 5;
-  const hobbyLabel = hobbies[preferences.hobby];
+  const hobbyLabel = getHobbyLabel(preferences.hobby, customHobby);
   const baseQuestion: PracticeQuestion = {
-    id: `${preferences.subject}-${preferences.stage}-${level}-${variant}`,
+    id: `${preferences.subject}-${preferences.grade}-${level}-${variant}`,
     title: getLessonTopic(preferences),
     prompt: bilingualText('', ''),
     expression: '',
@@ -108,7 +145,7 @@ export function createDemoQuestion(
   }
   if (preferences.subject === 'cs') {
     const limit = 3 + level + variantOffset;
-    if (preferences.stage === 'primary')
+    if (stage === 'primary')
       return {
         ...baseQuestion,
         prompt: bilingualText(
@@ -128,7 +165,7 @@ export function createDemoQuestion(
         recovery: '2 + 2 + 2 = ?',
         recoveryAnswer: 6,
       };
-    if (preferences.stage === 'middle')
+    if (stage === 'middle')
       return {
         ...baseQuestion,
         prompt: bilingualText(
@@ -168,7 +205,57 @@ export function createDemoQuestion(
       recoveryAnswer: 3,
     };
   }
-  if (preferences.stage === 'primary') {
+  if (stage === 'primary') {
+    if (preferences.grade <= 2) {
+      const starting = 8 + variantOffset + level;
+      const added = 3 + level;
+      const removed = level + 1;
+      return {
+        ...baseQuestion,
+        prompt: bilingualText(
+          `You have ${starting} ${hobbyLabel.en.toLowerCase()} cards, receive ${added}, and give away ${removed}. How many remain?`,
+          `יש לכם ${starting} קלפי ${hobbyLabel.he}, קיבלתם עוד ${added} ונתתם ${removed}. כמה נשארו?`,
+        ),
+        expression: `${starting} + ${added} − ${removed} = ?`,
+        answer: starting + added - removed,
+        hint: bilingualText(
+          'Add what you received first, then subtract what you gave away.',
+          'חברו קודם את מה שקיבלתם, ואז החסירו את מה שנתתם.',
+        ),
+        explanation: bilingualText(
+          'Addition makes the amount larger. Subtraction makes it smaller.',
+          'חיבור מגדיל את הכמות. חיסור מקטין אותה.',
+        ),
+        recovery: '5 + 3 = ?',
+        recoveryAnswer: 8,
+      };
+    }
+
+    if (preferences.grade >= 5) {
+      const denominator = level === 1 ? 2 : level === 2 ? 3 : 4;
+      const groupSize = 3 + variantOffset;
+      const total = denominator * groupSize;
+      return {
+        ...baseQuestion,
+        prompt: bilingualText(
+          `A collection has ${total} ${hobbyLabel.en.toLowerCase()} cards. You take 1/${denominator} of them. How many cards do you take?`,
+          `באוסף יש ${total} קלפי ${hobbyLabel.he}. לקחתם 1/${denominator} מהאוסף. כמה קלפים לקחתם?`,
+        ),
+        expression: `1/${denominator} × ${total} = ?`,
+        answer: groupSize,
+        hint: bilingualText(
+          `Divide ${total} into ${denominator} equal groups.`,
+          `חלקו את ${total} ל־${denominator} קבוצות שוות.`,
+        ),
+        explanation: bilingualText(
+          `One part out of ${denominator} equal parts means one equal group.`,
+          `חלק אחד מתוך ${denominator} חלקים שווים הוא קבוצה שווה אחת.`,
+        ),
+        recovery: '1/2 × 8 = ?',
+        recoveryAnswer: 4,
+      };
+    }
+
     const packCount = 3 + level;
     const stickersPerPack = 4 + variantOffset;
     const remove = level > 1 ? level + 2 : 0;
@@ -192,7 +279,7 @@ export function createDemoQuestion(
       recoveryAnswer: 12,
     };
   }
-  if (preferences.stage === 'high') {
+  if (stage === 'high') {
     const root = 3 + variantOffset;
     const coefficient = level;
     return {
@@ -242,16 +329,20 @@ export function createDemoQuestion(
     recoveryAnswer: 7,
   };
 }
-export function getDemoLesson(preferences: LearningPreferences): {
+export function getDemoLesson(
+  preferences: LearningPreferences,
+  customHobby = '',
+): {
   title: LocalizedText;
   paragraphs: LocalizedText[];
   takeaway: LocalizedText;
   source: LocalizedText;
 } {
-  const hobbyLabel = hobbies[preferences.hobby];
+  const stage = getSchoolStage(preferences.grade);
+  const hobbyLabel = getHobbyLabel(preferences.hobby, customHobby);
   let paragraphs: LocalizedText[];
   let takeaway: LocalizedText;
-  if (preferences.subject === 'math' && preferences.stage === 'middle') {
+  if (preferences.subject === 'math' && stage === 'middle') {
     paragraphs = [
       bilingualText(
         `Imagine planning a ${hobbyLabel.en.toLowerCase()} meetup with your friends. You have three identical mystery packs of stickers, plus six loose stickers. Altogether, you count 21.`,
@@ -270,10 +361,26 @@ export function getDemoLesson(preferences: LearningPreferences): {
       'Keep both sides balanced. Undo addition first, then multiplication.',
       'שומרים על איזון בשני האגפים. מבטלים קודם את החיבור, ואז את הכפל.',
     );
-  } else if (
-    preferences.subject === 'math' &&
-    preferences.stage === 'primary'
-  ) {
+  } else if (preferences.subject === 'math' && preferences.grade <= 2) {
+    paragraphs = [
+      bilingualText(
+        `You start with 8 ${hobbyLabel.en.toLowerCase()} cards and receive 5 more. Addition gives the new total: 8 + 5 = 13.`,
+        `התחלתם עם 8 קלפי ${hobbyLabel.he} וקיבלתם עוד 5. חיבור נותן את הכמות החדשה: 8 + 5 = 13.`,
+      ),
+      bilingualText(
+        'Then you give 3 cards to a friend. Subtraction tells us what remains: 13 − 3 = 10.',
+        'אחר כך נתתם 3 קלפים לחבר. חיסור נותן את מה שנשאר: 13 − 3 = 10.',
+      ),
+      bilingualText(
+        'Draw dots or count on your fingers when it helps. The goal is to see how the amount changes.',
+        'אפשר לצייר נקודות או לספור על האצבעות. המטרה היא לראות איך הכמות משתנה.',
+      ),
+    ];
+    takeaway = bilingualText(
+      'Add what arrives. Subtract what leaves.',
+      'מחברים את מה שמגיע. מחסרים את מה שיוצא.',
+    );
+  } else if (preferences.subject === 'math' && preferences.grade <= 4) {
     paragraphs = [
       bilingualText(
         `Your ${hobbyLabel.en.toLowerCase()} club makes four sticker packs. Each pack has four stickers. You could count every sticker, but equal groups give you a shortcut.`,
@@ -291,6 +398,25 @@ export function getDemoLesson(preferences: LearningPreferences): {
     takeaway = bilingualText(
       'Multiply equal groups. Subtract what you give away.',
       'כופלים קבוצות שוות. מפחיתים את מה שנותנים.',
+    );
+  } else if (preferences.subject === 'math' && stage === 'primary') {
+    paragraphs = [
+      bilingualText(
+        `Imagine 12 ${hobbyLabel.en.toLowerCase()} cards split equally between 3 friends. Each friend receives 4 cards.`,
+        `דמיינו 12 קלפי ${hobbyLabel.he} שמתחלקים שווה בשווה בין 3 חברים. כל חבר מקבל 4 קלפים.`,
+      ),
+      bilingualText(
+        'One third means one of three equal groups. So one third of 12 is 12 ÷ 3 = 4.',
+        'שליש הוא קבוצה אחת מתוך שלוש קבוצות שוות. לכן שליש מ־12 הוא 12 ÷ 3 = 4.',
+      ),
+      bilingualText(
+        'The denominator tells us how many equal groups to make. The numerator tells us how many groups to take.',
+        'המכנה אומר לכמה קבוצות שוות לחלק. המונה אומר כמה קבוצות לקחת.',
+      ),
+    ];
+    takeaway = bilingualText(
+      'A fraction describes equal parts of one whole.',
+      'שבר מתאר חלקים שווים מתוך שלם אחד.',
     );
   } else if (preferences.subject === 'math') {
     paragraphs = [
@@ -313,7 +439,7 @@ export function getDemoLesson(preferences: LearningPreferences): {
     );
   } else if (preferences.subject === 'cs') {
     paragraphs =
-      preferences.stage === 'high'
+      stage === 'high'
         ? [
             bilingualText(
               `Your ${hobbyLabel.en.toLowerCase()} club tracks a challenge: earn 1 point on day one, 2 on day two, and so on. How can code calculate the total?`,
@@ -343,7 +469,7 @@ export function getDemoLesson(preferences: LearningPreferences): {
             ),
           ];
     takeaway =
-      preferences.stage === 'high'
+      stage === 'high'
         ? bilingualText(
             'Find the base case, then trace the calls back up.',
             'מוצאים את תנאי העצירה, ואז עוקבים חזרה אחרי הקריאות.',

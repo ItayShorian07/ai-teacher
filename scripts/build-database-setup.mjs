@@ -5,6 +5,7 @@ const files = [
   'schema.sql',
   '004_learning_services.sql',
   '005_username_login.sql',
+  '006_profile_grade.sql',
 ];
 const sql = files
   .map((file) =>

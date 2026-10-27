@@ -18,8 +18,8 @@ export function InterestPicker({
     <fieldset className="interest-picker">
       <legend>
         {language === 'he'
-          ? 'מה מעניין אתכם? (לא חובה)'
-          : 'What interests you? (optional)'}
+          ? 'מה אתם אוהבים? אפשר לבחור כמה'
+          : 'What do you love? Choose as many as you like'}
       </legend>
       <div className="hobby-options">
         {interests.map(([id, en, he]) => (
@@ -52,7 +52,7 @@ export function InterestPicker({
           maxLength={60}
           placeholder={
             language === 'he'
-              ? 'למשל מיינקראפט, הארי פוטר או K-pop'
+              ? 'כתבו כל דבר אחר שאתם אוהבים'
               : 'Minecraft, Harry Potter or K-pop'
           }
         />

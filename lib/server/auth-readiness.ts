@@ -32,7 +32,7 @@ export async function getAuthReadiness() {
         signal: AbortSignal.timeout(5000),
       }),
       fetch(
-        `${url}/rest/v1/profiles?select=id,username,school,hobbies,custom_hobby&limit=0`,
+        `${url}/rest/v1/profiles?select=id,username,school,grade,hobbies,custom_hobby&limit=0`,
         {
           headers: serviceHeaders,
           cache: 'no-store',

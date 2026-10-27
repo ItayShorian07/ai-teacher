@@ -4,6 +4,7 @@ import { createTranslator, type Language } from '@/lib/i18n';
 import type { InputHTMLAttributes } from 'react';
 
 import type { ProfileFormValues } from '@/lib/profile-form-values';
+import { gradeNames, type SchoolGrade } from '@/lib/demo-lessons';
 export function ProfileFields({
   language,
   values,
@@ -73,6 +74,28 @@ export function ProfileFields({
           maxLength: undefined,
         })}
       </div>
+      <label className="auth-field">
+        {translate('Grade', 'כיתה')}
+        <select
+          name="grade"
+          value={values.grade}
+          required
+          onChange={(event) =>
+            onChange({ ...values, grade: event.target.value })
+          }
+        >
+          <option value="" disabled>
+            {translate('Choose your grade', 'בחרו כיתה')}
+          </option>
+          {(Object.keys(gradeNames).map(Number) as SchoolGrade[]).map(
+            (grade) => (
+              <option value={grade} key={grade}>
+                {gradeNames[grade][language]}
+              </option>
+            ),
+          )}
+        </select>
+      </label>
       {field('phone', translate('Mobile number', 'טלפון נייד'), {
         type: 'tel',
         autoComplete: 'tel',

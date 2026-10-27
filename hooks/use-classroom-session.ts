@@ -18,9 +18,11 @@ import {
   createDemoQuestion,
   getDemoLesson,
   getLessonTopic,
+  getSchoolStage,
   type Hobby,
   type LearningPreferences,
   type PracticeQuestion,
+  type Subject,
 } from '@/lib/demo-lessons';
 import {
   bilingualText,
@@ -39,6 +41,7 @@ import {
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import type { z } from 'zod';
 import { useDocumentLanguage } from './use-language';
+import { recordDemoCompletion, useDemoProgress } from './use-demo-progress';
 import { useLearningTools } from './use-learning-tools';
 
 type DisplayQuestion = Pick<
@@ -48,16 +51,17 @@ type DisplayQuestion = Pick<
 interface SessionOptions {
   isDemo: boolean;
   hasProAccess: boolean;
+  subject: Subject;
 }
 
 export function useClassroomSession(
   profile: AccountProfile,
-  { isDemo, hasProAccess }: SessionOptions,
+  { isDemo, hasProAccess, subject }: SessionOptions,
 ) {
   const [preferences, setPreferences] = useState<LearningPreferences>({
     lang: profile.locale,
-    subject: 'math',
-    stage: 'middle',
+    subject,
+    grade: profile.grade,
     hobby: getDefaultHobby(profile),
   });
   const [view, setView] = useState<ClassroomView>('story');
@@ -95,16 +99,26 @@ export function useClassroomSession(
   const language = preferences.lang;
   const translate = createTranslator(language);
   const localize = (text: LocalizedText) => text[language];
-  const demoQuestion = createDemoQuestion(preferences, level, variant);
+  const demoQuestion = createDemoQuestion(
+    preferences,
+    level,
+    variant,
+    customHobby,
+  );
   const question = generatedQuestion || demoQuestion;
-  const lesson = getDemoLesson(preferences);
+  const lesson = getDemoLesson(preferences, customHobby);
   const isSolved = answerFeedback?.status === 'correct';
+  const {
+    limitReached: demoLimitReached,
+    questionsRemaining: demoQuestionsRemaining,
+  } = useDemoProgress(isDemo);
   const currentStep = view === 'story' ? 0 : view === 'practice' ? 1 : 2;
   useDocumentLanguage(language);
   useLearningTools({
     language,
     subject: preferences.subject,
-    stage: preferences.stage,
+    grade: preferences.grade,
+    stage: getSchoolStage(preferences.grade),
     view,
     level,
     question: question.expression,
@@ -176,6 +190,9 @@ export function useClassroomSession(
       }
     }
     if (feedback.status === 'correct') {
+      if (isDemo) {
+        recordDemoCompletion();
+      }
       setPracticeHistory((history) => [
         ...history,
         {
@@ -248,7 +265,7 @@ export function useClassroomSession(
   }
 
   async function nextQuestion() {
-    if (isBusy) return;
+    if (isBusy || demoLimitReached) return;
     const nextLevel = getNextPracticeLevel(practiceHistory, level);
     const nextVariant = variant + 1;
     resetQuestion();
@@ -488,6 +505,8 @@ export function useClassroomSession(
     hasProAccess,
     selectHobby,
     uploadAnswerPdf,
+    demoLimitReached,
+    demoQuestionsRemaining,
   };
 }
 

@@ -58,7 +58,12 @@ async function reviewAnswer(
   if (!input.studentAnswer?.trim())
     throw new LearningError('answer_required', 400);
   if (!input.questionId) {
-    const question = createDemoQuestion(input, input.level, input.variant);
+    const question = createDemoQuestion(
+      input,
+      input.level,
+      input.variant,
+      input.customHobby,
+    );
     const feedback =
       input.action === 'recover'
         ? checkRecoveryAnswer(question, input.studentAnswer)
@@ -105,7 +110,7 @@ async function retrieveReferences(
     p_embedding: embedding,
     p_language: context.lang,
     p_subject: context.subject,
-    p_grade: { primary: 5, middle: 8, high: 11 }[context.stage],
+    p_grade: context.grade,
     p_topic: context.topic,
   };
   const { data: materialRows, error: materialError } = await database.rpc(

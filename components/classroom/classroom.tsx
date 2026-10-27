@@ -2,18 +2,19 @@
 import AccountLink from '@/components/auth/account-link';
 import ThemeToggle from '@/components/theme-toggle';
 import type { AccountProfile } from '@/lib/auth-validation';
-import { getLessonTopic, stages, Subject, subjects } from '@/lib/demo-lessons';
 import {
-  Calculator,
+  getLessonTopic,
+  gradeNames,
+  type Subject,
+  subjects,
+} from '@/lib/demo-lessons';
+import {
   Check,
   ChevronRight,
-  Code2,
   Globe2,
   GraduationCap,
-  LockKeyhole,
   PanelLeftClose,
   Settings2,
-  Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -28,14 +29,20 @@ import SessionSummary from './session-summary';
 import TutorPanel from './tutor-panel';
 export default function Classroom({
   profile,
+  subject,
   isDemo = false,
   hasProAccess = false,
 }: {
   profile: AccountProfile;
+  subject: Exclude<Subject, 'ai'>;
   isDemo?: boolean;
   hasProAccess?: boolean;
 }) {
-  const session = useClassroomSession(profile, { isDemo, hasProAccess });
+  const session = useClassroomSession(profile, {
+    isDemo,
+    hasProAccess,
+    subject,
+  });
   const {
     translate,
     localize,
@@ -46,9 +53,13 @@ export default function Classroom({
     currentStep,
     setView,
     notice,
+    demoLimitReached,
+    demoQuestionsRemaining,
+    isSolved,
   } = session;
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
+  const classroomHome = isDemo ? '/demo' : '/classroom';
   return (
     <div className="app-shell">
       <ClassroomSidebar
@@ -68,7 +79,9 @@ export default function Classroom({
             >
               <PanelLeftClose size={20} />
             </button>
-            {translate('My classroom', 'הכיתה שלי')}
+            <Link href={classroomHome}>
+              {translate('My classroom', 'הכיתה שלי')}
+            </Link>
             <ChevronRight size={14} />
             <strong>{localize(subjects[preferences.subject])}</strong>
           </div>
@@ -90,132 +103,131 @@ export default function Classroom({
           {isDemo && (
             <div className="demo-banner">
               {translate(
-                'You’re exploring the demo. AI generation and PDF reading require an account.',
-                'אתם בדמו. יצירת תוכן עם AI וקריאת PDF דורשות חשבון.',
-              )}{' '}
+                `The demo includes a full lesson and 3 exercises. ${demoQuestionsRemaining} exercises remain.`,
+                `הדמו כולל שיעור מלא ו־3 תרגילים. נשארו ${demoQuestionsRemaining} תרגילים.`,
+              )}
+              {' · '}
               <Link href="/register">
                 {translate('Create an account', 'יצירת חשבון')}
               </Link>
             </div>
           )}
-          <div className="page-intro">
-            <div>
-              <div className="eyebrow">
-                {translate(
-                  'A LITTLE CURIOSITY. A LOT OF POSSIBILITY.',
-                  'קצת סקרנות. הרבה אפשרויות.',
-                )}
-              </div>
-              <h1>
-                {view === 'summary'
-                  ? translate('Look how far you’ve come.', 'תראו כמה התקדמתם.')
-                  : translate('Let’s make it click.', 'בואו נבין את זה יחד.')}
-              </h1>
+          {demoLimitReached && !(view === 'practice' && isSolved) ? (
+            <section className="demo-limit-card">
+              <span className="demo-limit-icon">
+                <GraduationCap size={30} />
+              </span>
+              <h1>{translate('You completed the demo', 'סיימתם את הדמו')}</h1>
               <p>
                 {translate(
-                  'Your interests. Your pace. A way of learning that feels like you.',
-                  'התחביבים שלכם. הקצב שלכם. דרך ללמוד שמתאימה לכם.',
+                  'You learned the topic and completed three exercises. Create a free account to keep your progress and continue learning.',
+                  'למדתם את הנושא ופתרתם שלושה תרגילים. פתחו חשבון חינם כדי לשמור התקדמות ולהמשיך ללמוד.',
                 )}
               </p>
-            </div>
-            <button
-              className="stage-button"
-              onClick={() => setIsSettingsOpen(true)}
-            >
-              <GraduationCap size={19} />
-              {localize(stages[preferences.stage])}
-              <Settings2 size={15} />
-            </button>
-          </div>
-          <div
-            className="subject-tabs"
-            aria-label={translate('Subject', 'מקצוע')}
-          >
-            {(Object.keys(subjects) as Subject[]).map((option) => {
-              const Icon =
-                option === 'math'
-                  ? Calculator
-                  : option === 'cs'
-                    ? Code2
-                    : Sparkles;
-              return (
-                <button
-                  key={option}
-                  className={preferences.subject === option ? 'selected' : ''}
-                  onClick={() => updatePreferences({ subject: option })}
-                >
-                  <Icon size={19} />
-                  {localize(subjects[option])}
-                  {preferences.subject === option && (
-                    <span className="tab-dot" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-          <div className="learning-grid">
-            <div className="lesson-column">
-              <div className="lesson-topline">
-                <span>
-                  <span className="lesson-label">
-                    {translate('YOUR NEXT DISCOVERY', 'התגלית הבאה שלכם')}
-                  </span>
-                  <h2>{localize(getLessonTopic(preferences))}</h2>
-                </span>
-                <span className="lesson-number">
-                  01<span>/</span>03
-                </span>
+              <div className="demo-limit-actions">
+                <Link className="primary-button" href="/register">
+                  {translate('Create a free account', 'פתיחת חשבון חינם')}
+                </Link>
+                <Link className="text-button" href="/login">
+                  {translate('I already have an account', 'כבר יש לי חשבון')}
+                </Link>
               </div>
-              <div
-                className="journey"
-                aria-label={translate('Lesson steps', 'שלבי השיעור')}
-              >
-                {(['story', 'practice', 'summary'] as ClassroomView[]).map(
-                  (value, index) => (
-                    <button
-                      key={value}
-                      className={
-                        view === value
-                          ? 'current'
-                          : currentStep > index
-                            ? 'done'
-                            : ''
-                      }
-                      onClick={() => setView(value)}
-                    >
-                      <span>
-                        {currentStep > index ? <Check size={13} /> : index + 1}
-                      </span>
-                      {index === 0
-                        ? translate('The story', 'הסיפור')
-                        : index === 1
-                          ? translate('Try it yourself', 'מנסים בעצמנו')
-                          : translate('Reflect & grow', 'מסכמים ומתקדמים')}
-                    </button>
-                  ),
-                )}
-              </div>
-              {notice && (
-                <div className="notice" role="alert">
-                  {notice}
+            </section>
+          ) : (
+            <>
+              <div className="page-intro">
+                <div>
+                  <h1>
+                    {view === 'summary'
+                      ? translate('Session complete', 'סיימתם את הסבב')
+                      : view === 'practice'
+                        ? translate('Time to practice', 'עכשיו מתרגלים')
+                        : translate(
+                            'Learn it step by step',
+                            'לומדים צעד אחר צעד',
+                          )}
+                  </h1>
+                  <p>
+                    {translate(
+                      'One short explanation, focused practice, and immediate feedback.',
+                      'הסבר קצר, תרגול ממוקד ומשוב מיידי.',
+                    )}
+                  </p>
                 </div>
-              )}
-              {view === 'story' && <LessonView session={session} />}
-              {view === 'practice' && <PracticeView session={session} />}
-              {view === 'summary' && <SessionSummary session={session} />}
-              <div className="bottom-note">
-                <Link href="/contact">
-                  {translate('Contact & help', 'יצירת קשר ועזרה')}
-                </Link>{' '}
-                · <LockKeyhole size={13} />
-                {translate(
-                  'A space to explore. No grades, no pressure.',
-                  'מרחב לחקור. בלי ציונים, בלי לחץ.',
-                )}
+                <button
+                  className="grade-button"
+                  onClick={() => setIsSettingsOpen(true)}
+                >
+                  <GraduationCap size={19} />
+                  {localize(gradeNames[preferences.grade])}
+                  <Settings2 size={15} />
+                </button>
               </div>
-            </div>
-            <TutorPanel session={session} />
-          </div>
+              <div className="learning-grid">
+                <div className="lesson-column">
+                  <div className="lesson-topline">
+                    <span>
+                      <span className="lesson-label">
+                        {localize(subjects[preferences.subject])}
+                      </span>
+                      <h2>{localize(getLessonTopic(preferences))}</h2>
+                    </span>
+                    <span className="lesson-number">
+                      0{currentStep + 1}
+                      <span>/</span>03
+                    </span>
+                  </div>
+                  <div
+                    className="journey"
+                    aria-label={translate('Lesson steps', 'שלבי השיעור')}
+                  >
+                    {(['story', 'practice', 'summary'] as ClassroomView[]).map(
+                      (value, index) => (
+                        <button
+                          key={value}
+                          className={
+                            view === value
+                              ? 'current'
+                              : currentStep > index
+                                ? 'done'
+                                : ''
+                          }
+                          onClick={() => setView(value)}
+                        >
+                          <span>
+                            {currentStep > index ? (
+                              <Check size={13} />
+                            ) : (
+                              index + 1
+                            )}
+                          </span>
+                          {index === 0
+                            ? translate('Learn', 'לומדים')
+                            : index === 1
+                              ? translate('Practice', 'מתרגלים')
+                              : translate('Summary', 'מסכמים')}
+                        </button>
+                      ),
+                    )}
+                  </div>
+                  {notice && (
+                    <div className="notice" role="alert">
+                      {notice}
+                    </div>
+                  )}
+                  {view === 'story' && <LessonView session={session} />}
+                  {view === 'practice' && <PracticeView session={session} />}
+                  {view === 'summary' && <SessionSummary session={session} />}
+                  <div className="bottom-note">
+                    <Link href="/contact">
+                      {translate('Contact & help', 'יצירת קשר ועזרה')}
+                    </Link>
+                  </div>
+                </div>
+                <TutorPanel session={session} />
+              </div>
+            </>
+          )}
         </main>
       </div>
       {isSettingsOpen && (

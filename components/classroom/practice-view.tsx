@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 
 import type { ClassroomSession } from '@/hooks/use-classroom-session';
+import Link from 'next/link';
 
 export default function PracticeView({
   session,
@@ -38,6 +39,7 @@ export default function PracticeView({
     nextQuestion,
     uploadAnswerPdf,
     generatedQuestion,
+    demoLimitReached,
   } = session;
 
   return (
@@ -137,7 +139,12 @@ export default function PracticeView({
           <Lightbulb size={17} />
           {translate('A little hint', 'רמז קטן')}
         </button>
-        {isSolved ? (
+        {isSolved && demoLimitReached ? (
+          <Link className="primary-button" href="/register">
+            {translate('Continue with a free account', 'ממשיכים עם חשבון חינם')}
+            <ArrowRight size={17} />
+          </Link>
+        ) : isSolved ? (
           <button
             className="primary-button"
             onClick={nextQuestion}

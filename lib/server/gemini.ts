@@ -105,7 +105,7 @@ export async function createEmbedding(text: string) {
 }
 export async function generateStory(data: unknown) {
   return generateContent(
-    'Write a learning story of 3–4 paragraphs in the requested language and school stage, using the supplied topic, interests and reference material. End with the main idea. If material is empty, this is an original AI explanation, not a verified curriculum source.',
+    'Write a learning story of 3–4 paragraphs for the requested language and exact school grade, using the supplied topic, interests and reference material. End with the main idea. If material is empty, this is an original AI explanation, not a verified curriculum source.',
     data,
   );
 }
@@ -113,7 +113,7 @@ export async function generateQuestion(data: unknown) {
   return generatedQuestionSchema.parse(
     JSON.parse(
       await generateContent(
-        'Create an original practice question in the requested language and stage. Return JSON fields prompt, expression, answer, hint, explanation, recovery, recoveryAnswer, all strings. recovery is a separate simple prerequisite question and recoveryAnswer is its answer. The answer must be unambiguous and checked for correctness. For CS accept typed code or tracing as appropriate.',
+        'Create an original practice question in the requested language and exact school grade. Return JSON fields prompt, expression, answer, hint, explanation, recovery, recoveryAnswer, all strings. recovery is a separate simple prerequisite question and recoveryAnswer is its answer. The answer must be unambiguous and checked for correctness. For CS accept typed code or tracing as appropriate.',
         data,
         { json: true },
       ),

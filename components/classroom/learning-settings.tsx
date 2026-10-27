@@ -1,5 +1,10 @@
 'use client';
-import { hobbies, Hobby, SchoolStage, stages } from '@/lib/demo-lessons';
+import {
+  gradeNames,
+  hobbies,
+  type Hobby,
+  type SchoolGrade,
+} from '@/lib/demo-lessons';
 import { Language } from '@/lib/i18n';
 import { ArrowRight, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
@@ -13,8 +18,16 @@ export default function LearningSettings({
   session: ClassroomSession;
   onClose: () => void;
 }) {
-  const { translate, preferences, updatePreferences, localize, language } =
-    session;
+  const {
+    translate,
+    preferences,
+    updatePreferences,
+    localize,
+    language,
+    customHobby,
+    updateCustomHobby,
+    selectHobby,
+  } = session;
   const closeRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     closeRef.current?.focus();
@@ -55,18 +68,22 @@ export default function LearningSettings({
           )}
         </p>
         <label>
-          {translate('School stage', 'שלב לימודים')}
+          {translate('Grade', 'כיתה')}
           <select
-            value={preferences.stage}
+            value={preferences.grade}
             onChange={(event) =>
-              updatePreferences({ stage: event.target.value as SchoolStage })
+              updatePreferences({
+                grade: Number(event.target.value) as SchoolGrade,
+              })
             }
           >
-            {(Object.keys(stages) as SchoolStage[]).map((option) => (
-              <option value={option} key={option}>
-                {localize(stages[option])}
-              </option>
-            ))}
+            {(Object.keys(gradeNames).map(Number) as SchoolGrade[]).map(
+              (grade) => (
+                <option value={grade} key={grade}>
+                  {localize(gradeNames[grade])}
+                </option>
+              ),
+            )}
           </select>
         </label>
         <label>
@@ -85,9 +102,7 @@ export default function LearningSettings({
           {translate('Something you love', 'משהו שאתם אוהבים')}
           <select
             value={preferences.hobby}
-            onChange={(event) =>
-              updatePreferences({ hobby: event.target.value as Hobby })
-            }
+            onChange={(event) => selectHobby(event.target.value as Hobby)}
           >
             {(Object.keys(hobbies) as Hobby[]).map((hobby) => (
               <option value={hobby} key={hobby}>
@@ -95,6 +110,18 @@ export default function LearningSettings({
               </option>
             ))}
           </select>
+        </label>
+        <label>
+          {translate('Or write your own', 'או כתבו משהו משלכם')}
+          <input
+            value={customHobby}
+            maxLength={60}
+            onChange={(event) => updateCustomHobby(event.target.value)}
+            placeholder={translate(
+              'Minecraft, dancing, a favorite team…',
+              'מיינקראפט, ריקוד, קבוצה אהובה…',
+            )}
+          />
         </label>
         <div className="settings-divider" />
         <button className="primary-button full-width" onClick={() => onClose()}>

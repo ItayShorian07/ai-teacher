@@ -2,8 +2,6 @@
 import { bilingualText } from '@/lib/i18n';
 import {
   ArrowRight,
-  ArrowUpRight,
-  Brain,
   Check,
   CircleHelp,
   Lightbulb,
@@ -39,12 +37,9 @@ export default function TutorPanel({ session }: { session: ClassroomSession }) {
           <Sparkles size={24} />
         </span>
         <div>
-          <h3>{translate('Your learning companion', 'השותף שלכם ללמידה')}</h3>
-          <span>
-            {translate('Here for the aha moments', 'כאן לרגעי ההבנה')}
-          </span>
+          <h3>{translate('Your tutor', 'המורה האישי שלכם')}</h3>
+          <span>{translate('Here when you need help', 'כאן כשצריך עזרה')}</span>
         </div>
-        <span className="online-dot" />
       </div>
       {isPaused ? (
         <div className="coach-content" aria-live="polite">
@@ -93,49 +88,47 @@ export default function TutorPanel({ session }: { session: ClassroomSession }) {
         <>
           <div className="coach-content">
             <div className="coach-greeting">
-              {translate('Hey, curious mind.', 'היי, טוב שאתם כאן.')}{' '}
-              <span>✦</span>
+              {isSolved
+                ? translate('Nice work!', 'עבודה מצוינת!')
+                : view === 'practice'
+                  ? translate(
+                      'Take it one step at a time',
+                      'פותרים צעד אחר צעד',
+                    )
+                  : translate(
+                      'Start with the main idea',
+                      'מתחילים מהרעיון המרכזי',
+                    )}
             </div>
             <p>
               {isSolved
                 ? translate(
-                    'You did it! Take a moment to notice what made the answer click.',
-                    'הצלחתם! עצרו רגע וחשבו מה עזר לכם להבין.',
+                    'Notice what helped you solve it, then continue.',
+                    'שימו לב מה עזר לכם לפתור, ואז המשיכו.',
                   )
                 : view === 'practice'
                   ? translate(
-                      'Show me your thinking, one step at a time.',
-                      'הראו לי את דרך החשיבה שלכם, צעד אחר צעד.',
+                      'Write your attempt. Ask for a hint only if you need one.',
+                      'כתבו ניסיון. בקשו רמז רק אם צריך.',
                     )
                   : translate(
-                      'Big ideas feel smaller when they start with something you love.',
-                      'רעיונות גדולים נעשים פשוטים יותר כשהם מתחילים במשהו שאוהבים.',
+                      'Read the short explanation, then move to practice.',
+                      'קראו את ההסבר הקצר ואז עברו לתרגול.',
                     )}
             </p>
-            <div className="coach-prompt">
-              <span>&quot;</span>
-              {translate(
-                "You don't have to know it yet. That's why we're here.",
-                'אתם לא חייבים לדעת עדיין. בשביל זה אנחנו כאן.',
-              )}
-            </div>
-            <button className="coach-question" onClick={showFirstHint}>
-              <CircleHelp size={16} />
-              {translate('Help me take the first step', 'עזרו לי בצעד הראשון')}
-              <ArrowUpRight size={15} />
-            </button>
+            {view === 'practice' && !isSolved && (
+              <button className="coach-question" onClick={showFirstHint}>
+                <CircleHelp size={16} />
+                {translate('Show me a hint', 'הציגו רמז')}
+              </button>
+            )}
           </div>
           <div className="session-plan">
-            <div className="section-label">
-              {translate('OUR PLAN FOR TODAY', 'התוכנית שלנו להיום')}
-            </div>
+            <div className="section-label">{translate('TODAY', 'היום')}</div>
             {[
-              bilingualText('Connect it to your world', 'מחברים לעולם שלכם'),
-              bilingualText(
-                'Build understanding, step by step',
-                'בונים הבנה, צעד אחר צעד',
-              ),
-              bilingualText('Leave with an "I get it"', 'מסיימים עם ״הבנתי״'),
+              bilingualText('Learn', 'לומדים'),
+              bilingualText('Practice', 'מתרגלים'),
+              bilingualText('Review progress', 'בודקים התקדמות'),
             ].map((item, index) => (
               <div
                 className={`plan-step ${index === currentStep ? 'active' : ''}`}
@@ -147,17 +140,6 @@ export default function TutorPanel({ session }: { session: ClassroomSession }) {
                 {localize(item)}
               </div>
             ))}
-          </div>
-          <div className="coach-footer">
-            <span className="leaf-icon">
-              <Brain size={18} />
-            </span>
-            <p>
-              {translate(
-                'Built around understanding, not memorizing answers.',
-                'לומדים כדי להבין, לא כדי לשנן תשובות.',
-              )}
-            </p>
           </div>
         </>
       )}

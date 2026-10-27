@@ -2,6 +2,7 @@
 import { useLanguage } from '@/hooks/use-language';
 import { getAuthErrorMessage } from '@/lib/auth-error-messages';
 import { AccountProfile } from '@/lib/auth-validation';
+import { gradeNames } from '@/lib/demo-lessons';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { ArrowRight, CheckCircle2, LogOut, Settings2 } from 'lucide-react';
 import Link from 'next/link';
@@ -104,6 +105,10 @@ export default function AccountDetails({
           <dd>{profile.age}</dd>
         </div>
         <div>
+          <dt>{translate('Grade', 'כיתה')}</dt>
+          <dd>{gradeNames[profile.grade][language]}</dd>
+        </div>
+        <div>
           <dt>
             {translate('Email', 'מייל')} <CheckCircle2 size={14} />
           </dt>
@@ -131,12 +136,6 @@ export default function AccountDetails({
           {translate('Sign out', 'התנתקות')}
         </button>
       </div>
-      <p className="auth-field-note">
-        {translate(
-          'Your account details are saved. Learning progress in the demo is still limited to the current session.',
-          'פרטי החשבון נשמרים. ההתקדמות הלימודית בדמו עדיין מוגבלת למפגש הנוכחי.',
-        )}
-      </p>
       <div className="danger-zone">
         {deleting ? (
           <>

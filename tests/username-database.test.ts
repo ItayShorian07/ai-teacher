@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
-test('username migration enforces uniqueness, private lookup, owner access and atomic limits', async () => {
+test('account migrations enforce usernames, grades, owner access and atomic limits', async () => {
   const db = new PGlite();
   const alice = '00000000-0000-4000-8000-000000000001';
   const bob = '00000000-0000-4000-8000-000000000002';
@@ -30,10 +30,20 @@ test('username migration enforces uniqueness, private lookup, owner access and a
     );
     await db.exec(migration);
     await db.exec(migration); // Migration is safe to reapply.
+    const gradeMigration = await readFile(
+      new URL('../database/006_profile_grade.sql', import.meta.url),
+      'utf8',
+    );
+    await db.exec(gradeMigration);
+    await db.exec(gradeMigration);
     await db.query(
-      `insert into public.profiles(id,username,first_name,last_name,city,age,phone,locale)
-      values ($1,'alice','Alice','One','Haifa',18,'+972501234567','en'),($2,'bob','Bob','Two','Haifa',18,'+972501234568','en')`,
+      `insert into public.profiles(id,username,first_name,last_name,city,age,grade,phone,locale)
+      values ($1,'alice','Alice','One','Haifa',18,11,'+972501234567','en'),($2,'bob','Bob','Two','Haifa',18,11,'+972501234568','en')`,
       [alice, bob],
+    );
+    await assert.rejects(
+      db.query(`update public.profiles set grade=13 where id=$1`, [alice]),
+      /check constraint/i,
     );
     await assert.rejects(
       db.query(`update public.profiles set username='alice' where id=$1`, [

@@ -27,6 +27,7 @@ export default async function CompleteProfilePage({
     city: text(meta.city),
     phone: text(meta.phone),
     age: typeof meta.age === 'number' ? meta.age : undefined,
+    grade: typeof meta.grade === 'number' ? meta.grade : undefined,
     school: text(meta.school),
     hobbies: Array.isArray(meta.hobbies)
       ? meta.hobbies

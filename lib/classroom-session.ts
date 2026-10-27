@@ -15,6 +15,9 @@ export function getDefaultHobby(profile: AccountProfile): Hobby {
   const interests = [...(profile.hobbies || []), profile.custom_hobby || ''];
   for (const interest of interests) {
     const name = interest.toLowerCase();
+    if (name.includes('basket') || name.includes('כדורסל')) return 'basketball';
+    if (name.includes('fortnite') || name.includes('פורטנייט'))
+      return 'fortnite';
     if (name.includes('foot') || name.includes('כדורגל')) return 'football';
     if (name.includes('gam') || name.includes('גיי') || name.includes('משח'))
       return 'gaming';

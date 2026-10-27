@@ -20,6 +20,7 @@ test('profile interests select the matching demo track with a stable default', (
     last_name: 'לוי',
     city: 'חיפה',
     age: 14,
+    grade: 8,
     phone: '+972501234567',
     locale: 'he',
     school: 'תיכון חיפה',

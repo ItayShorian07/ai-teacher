@@ -22,6 +22,7 @@ export const accountProfileSchema = z
     last_name: profileText(60),
     city: profileText(100, 2),
     age: z.coerce.number().int().min(1).max(120),
+    grade: z.coerce.number().int().min(1).max(12),
     phone: z
       .string()
       .transform(normalizePhone)

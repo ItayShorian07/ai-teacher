@@ -5,8 +5,9 @@ Bilingual AI learning POC built with Next.js 16, Supabase and Gemini.
 - `/` and `/login`: username/email and password, email OTP, Google sign-in when configured, and a public demo link.
 - `/register`: username, password, profile details and email verification.
 - `/forgot-password` and `/account/password`: password recovery and authenticated password setup.
-- `/demo`: local lessons and deterministic practice without a login or AI calls.
-- `/classroom`: authenticated learning with required profile fields, optional interests, AI stories/questions, PDF transcription and Pro coaching.
+- `/demo`: one local lesson and a three-question trial without a login or AI calls.
+- `/classroom`: a subject hub with separate Mathematics and Computer Science learning pages.
+- `/classroom/math` and `/classroom/computer-science`: authenticated learning by exact grade, with optional interests, AI stories/questions, PDF transcription and Pro coaching.
 - `/account`: profile editing, sign-out and explicit account deletion.
 - `/contact`: contact information and FAQs.
 
@@ -26,7 +27,7 @@ Use `npm run check:connections` for current configuration and database checks. C
 
 Read the full [implementation and connection report in Hebrew](docs/IMPLEMENTATION_STATUS.he.md). It maps every requested feature, explains bot protection and lists exact activation steps and limitations.
 
-Read the [account activation guide](docs/ACCOUNTS_SETUP.he.md) for username login, recovery and provider setup. Existing installations also need `database/005_username_login.sql`. Passwords remain in Supabase Auth.
+Read the [account activation guide](docs/ACCOUNTS_SETUP.he.md) for username login, recovery and provider setup. Existing installations also need `database/005_username_login.sql` and `database/006_profile_grade.sql`. Passwords remain in Supabase Auth.
 
 ## Setup
 

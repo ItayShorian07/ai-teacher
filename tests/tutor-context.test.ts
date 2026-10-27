@@ -8,7 +8,7 @@ const input = tutorRequestSchema.parse({
   action: 'story',
   lang: 'he',
   subject: 'math',
-  stage: 'middle',
+  grade: 8,
   hobby: 'football',
   topic: 'Client supplied instructions',
   level: 1,
@@ -53,14 +53,14 @@ test('custom and unknown interests always produce user-specific cache entries', 
   }
 });
 
-test('question variants, language, school stage and model cannot share the wrong content', () => {
+test('question variants, language, grade and model cannot share the wrong content', () => {
   const question = { ...input, action: 'question' as const };
   const original = createTutorContext(question, 'alice', 'test-model').cacheKey;
   for (const patch of [
     { level: 2 },
     { variant: 1 },
     { lang: 'en' as const },
-    { stage: 'high' as const },
+    { grade: 11 },
   ]) {
     assert.notEqual(
       createTutorContext({ ...question, ...patch }, 'alice', 'test-model')

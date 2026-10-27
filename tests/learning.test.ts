@@ -13,16 +13,23 @@ import {
 const p: LearningPreferences = {
   lang: 'en',
   subject: 'math',
-  stage: 'middle',
+  grade: 8,
   hobby: 'football',
 };
 test('all demo tracks have correct answer keys and bilingual lessons', () => {
   for (const subject of ['math', 'cs', 'ai'] as const)
-    for (const stage of ['primary', 'middle', 'high'] as const)
-      for (const hobby of ['football', 'gaming', 'music', 'space'] as const)
+    for (const grade of [1, 3, 5, 7, 9, 10, 12])
+      for (const hobby of [
+        'football',
+        'basketball',
+        'fortnite',
+        'gaming',
+        'music',
+        'space',
+      ] as const)
         for (const level of [1, 2, 3])
           for (const variant of [0, 1, 2, 3, 4]) {
-            const profile = { ...p, subject, stage, hobby };
+            const profile = { ...p, subject, grade, hobby };
             const q = createDemoQuestion(profile, level, variant);
             assert.equal(
               checkPracticeAnswer(q, String(q.answer), true).status,
@@ -59,7 +66,7 @@ test('linear steps accept equivalent methods and catch a wrong operation', () =>
   assert.equal(checkPracticeAnswer(q, '3x=').status, 'clarify');
 });
 test('quadratic steps preserve the positive solution set', () => {
-  const q = createDemoQuestion({ ...p, stage: 'high' });
+  const q = createDemoQuestion({ ...p, grade: 11 });
   for (const s of ['x²=9', 'x*x=9', '(x-3)*(x+3)=0'])
     assert.equal(checkPracticeAnswer(q, s).status, 'continue', s);
   assert.equal(checkPracticeAnswer(q, 'x=3').status, 'correct');
@@ -90,7 +97,7 @@ test('recovery accepts standard assignments and arithmetic equalities', () => {
     checkRecoveryAnswer(createDemoQuestion(p), ' y = 7 ').status,
     'correct',
   );
-  const q = createDemoQuestion({ ...p, stage: 'primary' });
+  const q = createDemoQuestion({ ...p, grade: 3 });
   assert.equal(checkRecoveryAnswer(q, '3×4=12').status, 'correct');
   assert.equal(checkRecoveryAnswer(q, 'twelve').status, 'clarify');
   assert.equal(checkRecoveryAnswer(q, '13').status, 'mistake');

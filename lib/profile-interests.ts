@@ -6,6 +6,7 @@ export const interests = [
   ['cooking', 'Cooking', 'בישול'],
   ['anime', 'Anime', 'אנימה'],
   ['basketball', 'Basketball', 'כדורסל'],
+  ['fortnite', 'Fortnite', 'פורטנייט'],
   ['dance', 'Dance', 'ריקוד'],
   ['drawing', 'Drawing', 'ציור'],
   ['coding', 'Coding', 'תכנות'],

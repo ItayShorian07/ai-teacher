@@ -1,6 +1,7 @@
 export type LearningSnapshot = {
   language: string;
   subject: string;
+  grade: number;
   stage: string;
   view: string;
   level: number;

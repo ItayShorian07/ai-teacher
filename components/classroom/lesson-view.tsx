@@ -17,6 +17,8 @@ import { useState } from 'react';
 import type { ClassroomSession } from '@/hooks/use-classroom-session';
 const hobbyIcons = {
   football: Volleyball,
+  basketball: Volleyball,
+  fortnite: Gamepad2,
   gaming: Gamepad2,
   music: Music2,
   space: Rocket,
@@ -137,19 +139,21 @@ export default function LessonView({ session }: { session: ClassroomSession }) {
           <ArrowRight size={17} />
         </button>
       </div>
-      <button
-        className="text-button"
-        onClick={generateLesson}
-        disabled={isBusy || isDemo}
-      >
-        <Sparkles size={16} />
-        {isBusy
-          ? translate('Creating your lesson…', 'יוצרים את השיעור…')
-          : translate(
-              'Create a personalized story with AI',
-              'יצירת סיפור אישי עם AI',
-            )}
-      </button>
+      {!isDemo && (
+        <button
+          className="text-button"
+          onClick={generateLesson}
+          disabled={isBusy}
+        >
+          <Sparkles size={16} />
+          {isBusy
+            ? translate('Creating your lesson…', 'יוצרים את השיעור…')
+            : translate(
+                'Create a personalized story with AI',
+                'יצירת סיפור אישי עם AI',
+              )}
+        </button>
+      )}
     </>
   );
 }

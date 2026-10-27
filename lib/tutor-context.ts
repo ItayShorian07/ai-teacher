@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { getLessonTopic } from './demo-lessons';
+import { getLessonTopic, getSchoolStage } from './demo-lessons';
 import { interests } from './profile-interests';
 import type { TutorInput } from './tutor-contract';
 
@@ -20,7 +20,8 @@ export function createTutorContext(
     subject: input.subject,
     // Use the curriculum topic rather than the client's free-form topic.
     topic: getLessonTopic(input)[input.lang],
-    stage: input.stage,
+    grade: input.grade,
+    stage: getSchoolStage(input.grade),
     lang: input.lang,
     level: input.action === 'question' ? input.level : 0,
     variant: input.action === 'question' ? input.variant : 0,
@@ -32,7 +33,7 @@ export function createTutorContext(
   const cacheKey = createHash('sha256')
     .update(
       JSON.stringify({
-        v: 2,
+        v: 3,
         model,
         action: input.action,
         context,
