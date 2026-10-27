@@ -1,152 +1,55 @@
 'use client';
-import { useLanguage } from '@/hooks/use-language';
-import { useResendCooldown } from '@/hooks/use-resend-cooldown';
 import { getAuthErrorMessage } from '@/lib/auth-error-messages';
-import {
-  accountProfileSchema,
-  emailSchema,
-  getAuthErrorCode,
-  otpSchema,
-} from '@/lib/auth-validation';
-import { type Language } from '@/lib/i18n';
-import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { ArrowLeft, ArrowRight, CheckCircle2, Mail } from 'lucide-react';
 import Link from 'next/link';
-import { FormEvent, useCallback, useState } from 'react';
 import { AuthLayout, GoogleIcon, RegistrationNotice } from './auth-layout';
 import { InterestPicker } from './interest-picker';
-import { ProfileFields, createProfileFormValues } from './profile-fields';
+import { ProfileFields } from './profile-fields';
 import { TurnstileChallenge } from './turnstile-challenge';
-export default function AuthForm({
-  mode,
-  configured,
-  initialLanguage,
-  googleEnabled,
-  errorCode = '',
-}: {
-  mode: 'login' | 'register';
-  configured: boolean;
-  googleEnabled: boolean;
-  initialLanguage: Language;
-  errorCode?: string;
-}) {
-  const { language, setLanguage, translate } = useLanguage(initialLanguage);
-  const isRegistration = mode === 'register';
-  const [email, setEmail] = useState('');
-  const [details, setDetails] = useState(() => createProfileFormValues());
-  const [interests, setInterests] = useState<string[]>([]);
-  const [customHobby, setCustomHobby] = useState('');
-  const [step, setStep] = useState<'details' | 'email'>('details');
-  const [verificationCode, setVerificationCode] = useState('');
-  const [isBusy, setIsBusy] = useState(false);
-  const [submissionError, setSubmissionError] = useState(errorCode);
-  const { remaining, start } = useResendCooldown();
-  const [captchaToken, setCaptchaToken] = useState('');
-  const [captchaVersion, setCaptchaVersion] = useState(0);
-  const onCaptcha = useCallback((value: string) => setCaptchaToken(value), []);
-  function resetCaptcha() {
-    setCaptchaToken('');
-    setCaptchaVersion((v) => v + 1);
-  }
-  async function sendEmailCode(event?: FormEvent) {
-    event?.preventDefault();
-    if (isBusy || remaining) return;
-    setSubmissionError('');
-    if (!configured) {
-      setSubmissionError('not_configured');
-      return;
-    }
-    const validatedEmail = emailSchema.safeParse(email);
-    if (!validatedEmail.success) {
-      setSubmissionError('invalid_email');
-      return;
-    }
-    const profile = isRegistration
-      ? accountProfileSchema.safeParse({
-          ...details,
-          locale: language,
-          hobbies: interests,
-          custom_hobby: customHobby,
-        })
-      : null;
-    if (profile && !profile.success) {
-      setSubmissionError('invalid_profile');
-      return;
-    }
-    if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !captchaToken) {
-      setSubmissionError('captcha');
-      return;
-    }
-    setIsBusy(true);
-    try {
-      const { error: err } =
-        await createBrowserSupabaseClient().auth.signInWithOtp({
-          email: validatedEmail.data,
-          options: {
-            shouldCreateUser: isRegistration,
-            ...(profile?.success ? { data: profile.data } : {}),
-            ...(captchaToken ? { captchaToken } : {}),
-          },
-        });
-      // A sign-in request for an unknown email must not reveal account existence.
-      if (err && err.code !== 'otp_disabled' && err.code !== 'user_not_found')
-        throw err;
-      setEmail(validatedEmail.data);
-      setStep('email');
-      start();
-    } catch (e) {
-      setSubmissionError(getAuthErrorCode(e));
-    } finally {
-      setIsBusy(false);
-      resetCaptcha();
-    }
-  }
-  async function verifyEmailCode(event: FormEvent) {
-    event.preventDefault();
-    if (isBusy) return;
-    const parsed = otpSchema.safeParse(verificationCode);
-    if (!parsed.success) {
-      setSubmissionError('invalid_code');
-      return;
-    }
-    setIsBusy(true);
-    setSubmissionError('');
-    try {
-      const { data, error: err } =
-        await createBrowserSupabaseClient().auth.verifyOtp({
-          email,
-          token: parsed.data,
-          type: 'email',
-        });
-      if (err || !data.session) {
-        setSubmissionError(err ? getAuthErrorCode(err) : 'invalid_code');
-        return;
-      }
-      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- Reload after the session changes to clear client state.
-      window.location.assign('/account/complete');
-    } catch {
-      setSubmissionError('unavailable');
-    } finally {
-      setIsBusy(false);
-    }
-  }
-  async function signInWithGoogle() {
-    if (!configured || isBusy) return;
-    setIsBusy(true);
-    setSubmissionError('');
-    try {
-      const { error: err } =
-        await createBrowserSupabaseClient().auth.signInWithOAuth({
-          provider: 'google',
-          options: { redirectTo: `${window.location.origin}/auth/callback` },
-        });
-      if (err) throw err;
-    } catch (e) {
-      setSubmissionError(getAuthErrorCode(e));
-      setIsBusy(false);
-    }
-  }
 
+import { useAuthForm, type AuthFormOptions } from '@/hooks/use-auth-form';
+export default function AuthForm(options: AuthFormOptions) {
+  const {
+    configured,
+    googleEnabled,
+    passwordEnabled,
+    language,
+    setLanguage,
+    translate,
+    isRegistration,
+    email,
+    setEmail,
+    details,
+    setDetails,
+    method,
+    setMethod,
+    identifier,
+    setIdentifier,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+    interests,
+    setInterests,
+    customHobby,
+    setCustomHobby,
+    step,
+    setStep,
+    token,
+    setToken,
+    isBusy,
+    error,
+    setError,
+    remaining,
+    captchaToken,
+    captchaVersion,
+    onCaptcha,
+    resetCaptcha,
+    sendEmailCode,
+    signInWithPassword,
+    verifyEmailCode,
+    signInWithGoogle,
+  } = useAuthForm(options);
   return (
     <AuthLayout
       language={language}
@@ -180,9 +83,9 @@ export default function AuthForm({
               )}
       </p>
       {!configured && <RegistrationNotice language={language} />}
-      {submissionError && (
+      {error && (
         <div className="auth-error" role="alert">
-          {getAuthErrorMessage(submissionError, language)}
+          {getAuthErrorMessage(error, language)}
         </div>
       )}
       {step === 'email' ? (
@@ -200,8 +103,10 @@ export default function AuthForm({
                 inputMode="numeric"
                 autoComplete="one-time-code"
                 dir="ltr"
-                value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                value={token}
+                onChange={(event) =>
+                  setToken(event.target.value.replace(/\D/g, ''))
+                }
                 maxLength={10}
                 pattern="[0-9]{6,10}"
                 required
@@ -227,7 +132,10 @@ export default function AuthForm({
                 'המייל לא הגיע? בדקו גם בתיקיית הספאם.',
               )}
             </span>
-            <button onClick={() => sendEmailCode()} disabled={isBusy || remaining > 0}>
+            <button
+              onClick={() => sendEmailCode()}
+              disabled={isBusy || remaining > 0}
+            >
               {remaining
                 ? translate(
                     `Resend in ${remaining}s`,
@@ -240,8 +148,8 @@ export default function AuthForm({
             className="auth-back"
             onClick={() => {
               setStep('details');
-              setVerificationCode('');
-              setSubmissionError('');
+              setToken('');
+              setError('');
             }}
           >
             <ArrowLeft size={16} />
@@ -268,10 +176,59 @@ export default function AuthForm({
           )}
           <div className="auth-divider">
             <span>
-              {translate('or with your email', 'או באמצעות המייל שלכם')}
+              {translate('or with your account', 'או עם החשבון שלכם')}
             </span>
           </div>
-          <form className="auth-form" onSubmit={sendEmailCode}>
+          {!isRegistration && (
+            <div
+              className="auth-methods"
+              role="group"
+              aria-label={translate('Sign-in method', 'אופן ההתחברות')}
+            >
+              <button
+                type="button"
+                aria-pressed={method === 'password'}
+                onClick={() => {
+                  setMethod('password');
+                  setError('');
+                  resetCaptcha();
+                }}
+              >
+                {translate('Username & password', 'שם משתמש וסיסמה')}
+              </button>
+              <button
+                type="button"
+                aria-pressed={method === 'code'}
+                onClick={() => {
+                  setMethod('code');
+                  setPassword('');
+                  setError('');
+                  resetCaptcha();
+                }}
+              >
+                {translate('Email code', 'קוד במייל')}
+              </button>
+            </div>
+          )}
+          {!isRegistration &&
+            method === 'password' &&
+            configured &&
+            !passwordEnabled && (
+              <p className="auth-field-note" role="status">
+                {translate(
+                  'Password sign-in is being set up. You can use an email code.',
+                  'כניסה בסיסמה עדיין בהגדרה. אפשר להשתמש בקוד למייל.',
+                )}
+              </p>
+            )}
+          <form
+            className="auth-form"
+            onSubmit={
+              !isRegistration && method === 'password'
+                ? signInWithPassword
+                : sendEmailCode
+            }
+          >
             {isRegistration && (
               <>
                 <ProfileFields
@@ -288,25 +245,96 @@ export default function AuthForm({
                 />
               </>
             )}
-            <label className="auth-field">
-              {translate('Email address', 'כתובת מייל')}
-              <input
-                name="email"
-                type="email"
-                dir="ltr"
-                autoComplete="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                maxLength={254}
-                required
-              />
-            </label>
-            {!isRegistration && (
+            {!isRegistration && method === 'password' ? (
+              <label className="auth-field">
+                {translate('Username or email', 'שם משתמש או מייל')}
+                <input
+                  name="username"
+                  dir="ltr"
+                  autoComplete="username"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  placeholder="itay_shorian"
+                  value={identifier}
+                  onChange={(event) => setIdentifier(event.target.value)}
+                  maxLength={254}
+                  required
+                />
+              </label>
+            ) : (
+              <label className="auth-field">
+                {translate('Email address', 'כתובת מייל')}
+                <input
+                  name="email"
+                  type="email"
+                  dir="ltr"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  maxLength={254}
+                  required
+                />
+              </label>
+            )}
+            {(isRegistration || method === 'password') && (
+              <>
+                <label className="auth-field">
+                  {translate('Password', 'סיסמה')}
+                  <input
+                    name="password"
+                    type="password"
+                    dir="ltr"
+                    autoComplete={
+                      isRegistration ? 'new-password' : 'current-password'
+                    }
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    minLength={isRegistration ? 12 : 1}
+                    maxLength={128}
+                    required
+                  />
+                </label>
+                {isRegistration ? (
+                  <>
+                    <p className="auth-field-note">
+                      {translate(
+                        'Use at least 12 characters. A few unrelated words make a good passphrase.',
+                        'לפחות 12 תווים. אפשר להשתמש בכמה מילים שאינן קשורות זו לזו.',
+                      )}
+                    </p>
+                    <label className="auth-field">
+                      {translate('Confirm password', 'אימות סיסמה')}
+                      <input
+                        name="password_confirmation"
+                        type="password"
+                        dir="ltr"
+                        autoComplete="new-password"
+                        value={confirmPassword}
+                        onChange={(event) =>
+                          setConfirmPassword(event.target.value)
+                        }
+                        minLength={12}
+                        maxLength={128}
+                        required
+                      />
+                    </label>
+                  </>
+                ) : (
+                  <Link
+                    className="auth-password-help"
+                    href={`/forgot-password?lang=${language}`}
+                  >
+                    {translate('Forgot your password?', 'שכחתם את הסיסמה?')}
+                  </Link>
+                )}
+              </>
+            )}
+            {!isRegistration && method === 'code' && (
               <p className="auth-field-note">
                 {translate(
-                  'We’ll send a one-time sign-in code. No password to remember.',
-                  'נשלח קוד התחברות חד־פעמי. אין צורך לזכור סיסמה.',
+                  'Use an email code, including for an existing account without a password.',
+                  'אפשר להיכנס בקוד למייל גם לחשבון קיים שעדיין אין לו סיסמה.',
                 )}
               </p>
             )}
@@ -318,16 +346,25 @@ export default function AuthForm({
             )}
             <button
               className="primary-button auth-submit"
-              disabled={isBusy || !configured || remaining > 0}
+              disabled={
+                isBusy ||
+                !configured ||
+                !captchaToken ||
+                (!isRegistration && method === 'password'
+                  ? !passwordEnabled
+                  : remaining > 0)
+              }
             >
               {isBusy
-                ? translate('Sending…', 'שולחים…')
+                ? translate('Please wait…', 'רק רגע…')
                 : isRegistration
                   ? translate(
-                      'Create account & send code',
-                      'יצירת חשבון ושליחת קוד',
+                      'Create account & verify email',
+                      'יצירת חשבון ואימות מייל',
                     )
-                  : translate('Send sign-in code', 'שליחת קוד התחברות')}
+                  : method === 'password'
+                    ? translate('Sign in', 'התחברות')
+                    : translate('Send sign-in code', 'שליחת קוד התחברות')}
               <ArrowRight size={17} />
             </button>
           </form>

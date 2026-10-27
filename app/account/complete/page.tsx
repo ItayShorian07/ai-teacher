@@ -20,6 +20,7 @@ export default async function CompleteProfilePage({
   const text = (value: unknown) =>
     typeof value === 'string' ? value.slice(0, 100) : '';
   const initial = account.profile || {
+    username: text(meta.username),
     first_name: text(meta.first_name || meta.given_name),
     last_name: text(meta.last_name || meta.family_name),
     city: text(meta.city),
@@ -27,7 +28,9 @@ export default async function CompleteProfilePage({
     age: typeof meta.age === 'number' ? meta.age : undefined,
     school: text(meta.school),
     hobbies: Array.isArray(meta.hobbies)
-      ? meta.hobbies.filter((h: unknown) => typeof h === 'string').slice(0, 20)
+      ? meta.hobbies
+          .filter((interest: unknown) => typeof interest === 'string')
+          .slice(0, 20)
       : [],
     custom_hobby: text(meta.custom_hobby),
     locale: meta.locale === 'en' ? ('en' as const) : ('he' as const),

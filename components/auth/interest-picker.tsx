@@ -10,9 +10,9 @@ export function InterestPicker({
 }: {
   language: 'he' | 'en';
   values: string[];
-  onChange: (v: string[]) => void;
+  onChange: (value: string[]) => void;
   custom: string;
-  onCustom: (v: string) => void;
+  onCustom: (value: string) => void;
 }) {
   return (
     <fieldset className="interest-picker">
@@ -31,7 +31,7 @@ export function InterestPicker({
             onClick={() =>
               onChange(
                 values.includes(id)
-                  ? values.filter((x) => x !== id)
+                  ? values.filter((selectedInterest) => selectedInterest !== id)
                   : values.length < 20
                     ? [...values, id]
                     : values,
@@ -48,7 +48,7 @@ export function InterestPicker({
           : 'Something else you love'}
         <input
           value={custom}
-          onChange={(e) => onCustom(e.target.value)}
+          onChange={(event) => onCustom(event.target.value)}
           maxLength={60}
           placeholder={
             language === 'he'

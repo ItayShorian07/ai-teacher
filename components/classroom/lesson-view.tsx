@@ -98,9 +98,9 @@ export default function LessonView({ session }: { session: ClassroomSession }) {
             ? generatedLesson.text
                 .split('\n')
                 .filter(Boolean)
-                .map((line, i) => <p key={i}>{line}</p>)
-            : lesson.paragraphs.map((line, i) => (
-                <p key={i}>{localize(line)}</p>
+                .map((line, index) => <p key={index}>{line}</p>)
+            : lesson.paragraphs.map((line, index) => (
+                <p key={index}>{localize(line)}</p>
               ))}
         </div>
         <button

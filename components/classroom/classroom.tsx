@@ -171,24 +171,24 @@ export default function Classroom({
                 aria-label={translate('Lesson steps', 'שלבי השיעור')}
               >
                 {(['story', 'practice', 'summary'] as ClassroomView[]).map(
-                  (value, i) => (
+                  (value, index) => (
                     <button
                       key={value}
                       className={
                         view === value
                           ? 'current'
-                          : currentStep > i
+                          : currentStep > index
                             ? 'done'
                             : ''
                       }
                       onClick={() => setView(value)}
                     >
                       <span>
-                        {currentStep > i ? <Check size={13} /> : i + 1}
+                        {currentStep > index ? <Check size={13} /> : index + 1}
                       </span>
-                      {i === 0
+                      {index === 0
                         ? translate('The story', 'הסיפור')
-                        : i === 1
+                        : index === 1
                           ? translate('Try it yourself', 'מנסים בעצמנו')
                           : translate('Reflect & grow', 'מסכמים ומתקדמים')}
                     </button>

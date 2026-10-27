@@ -5,7 +5,7 @@ export function useResendCooldown() {
   useEffect(() => {
     if (!remaining) return;
     const timer = setTimeout(
-      () => setRemaining((n) => Math.max(0, n - 1)),
+      () => setRemaining((secondsLeft) => Math.max(0, secondsLeft - 1)),
       1000,
     );
     return () => clearTimeout(timer);

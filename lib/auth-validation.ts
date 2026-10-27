@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { usernameSchema } from './password-validation';
 export function normalizePhone(value: string): string {
   const clean = value.trim().replace(/[\s()\-]/g, '');
   if (/^05\d{8}$/.test(clean)) return `+972${clean.slice(1)}`;
@@ -16,6 +17,7 @@ function profileText(maxLength: number, minLength = 1) {
 
 export const accountProfileSchema = z
   .object({
+    username: usernameSchema,
     first_name: profileText(60),
     last_name: profileText(60),
     city: profileText(100, 2),
@@ -77,6 +79,10 @@ export function getAuthErrorCode(error: unknown): string {
   if (status === 429 || code.includes('rate_limit')) return 'rate_limit';
   if (code === 'otp_expired' || code === 'otp_disabled') return 'invalid_code';
   if (code.includes('captcha')) return 'captcha';
+  if (code === 'invalid_credentials' || code === 'email_not_confirmed')
+    return 'invalid_credentials';
+  if (code === 'weak_password') return 'weak_password';
+  if (code === 'same_password') return 'same_password';
   return 'unavailable';
 }
 

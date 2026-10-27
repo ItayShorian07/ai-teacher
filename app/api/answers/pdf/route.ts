@@ -33,14 +33,17 @@ export async function POST(request: Request) {
       data.get('lang') === 'en' ? 'en' : 'he',
     );
     return privateJsonResponse({ text: text.slice(0, 8000) });
-  } catch (e) {
-    if (e instanceof Error && e.message === 'BODY_TOO_LARGE')
+  } catch (error) {
+    if (error instanceof Error && error.message === 'BODY_TOO_LARGE')
       return privateJsonResponse({ error: 'pdf_too_large' }, 413);
-    if (e instanceof Error && e.message === 'EMPTY_BODY')
+    if (error instanceof Error && error.message === 'EMPTY_BODY')
       return privateJsonResponse({ error: 'invalid_pdf' }, 400);
     return privateJsonResponse(
-      { error: e instanceof LearningError ? e.message : 'pdf_unavailable' },
-      e instanceof LearningError ? e.status : 503,
+      {
+        error:
+          error instanceof LearningError ? error.message : 'pdf_unavailable',
+      },
+      error instanceof LearningError ? error.status : 503,
     );
   }
 }

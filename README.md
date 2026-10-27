@@ -2,7 +2,9 @@
 
 Bilingual AI learning POC built with Next.js 16, Supabase and Gemini.
 
-- `/` and `/login`: email OTP login, registration link, Google sign-in when configured, public demo link.
+- `/` and `/login`: username/email and password, email OTP, Google sign-in when configured, and a public demo link.
+- `/register`: username, password, profile details and email verification.
+- `/forgot-password` and `/account/password`: password recovery and authenticated password setup.
 - `/demo`: local lessons and deterministic practice without a login or AI calls.
 - `/classroom`: authenticated learning with required profile fields, optional interests, AI stories/questions, PDF transcription and Pro coaching.
 - `/account`: profile editing, sign-out and explicit account deletion.
@@ -14,6 +16,8 @@ A persistent light/dark switch is available in the authentication and classroom 
 
 Read the [working agreement and environment setup (Hebrew)](docs/WORKFLOW.he.md) before testing registration. Local development and Vercel Preview use a non-production Supabase project; production uses a separate project. Register their public URLs in [`config/environments.json`](config/environments.json). Unregistered or mismatched service environments fail at startup and build time.
 
+The [code structure guide (Hebrew)](docs/CODE_STRUCTURE.he.md) explains component boundaries, server services and naming conventions.
+
 Work on short feature branches and merge pull requests into `main` after CI and Preview checks. The repository includes CI and a PR template; Vercel environment settings and GitHub branch protection still need to be configured in their dashboards.
 
 ## Current connection status
@@ -21,6 +25,8 @@ Work on short feature branches and merge pull requests into `main` after CI and 
 Use `npm run check:connections` for current configuration and database checks. Credentials belong in the ignored `.env.local` file and the hosting environment, never in `.env.example`. A successful configuration check does not replace end-to-end verification of email delivery, OAuth, data isolation or deletion. The site disables auth controls when the required profile schema or Turnstile configuration is unavailable.
 
 Read the full [implementation and connection report in Hebrew](docs/IMPLEMENTATION_STATUS.he.md). It maps every requested feature, explains bot protection and lists exact activation steps and limitations.
+
+Read the [account activation guide](docs/ACCOUNTS_SETUP.he.md) for username login, recovery and provider setup. Existing installations also need `database/005_username_login.sql`. Passwords remain in Supabase Auth.
 
 ## Setup
 
@@ -40,7 +46,7 @@ npm run check:env -- --development
 npm run check:connections
 ```
 
-`npm run check` includes an isolated build without external credentials. Use `npm run build` to validate a real deployment configuration. For local route checks, set `NEXT_PUBLIC_SITE_URL=http://127.0.0.1:3100`, run `npm run dev -- --port 3100`, then `npm run check:routes`. Tests cover environment separation, preview origins, the demo checker, auth validation, same-account phone verification, signed bot-proof expiry/tampering, AI input validation and PDF bounds. Live integration tests require configured non-production services.
+`npm run check` includes an isolated build without external credentials. Use `npm run build` to validate a real deployment configuration. For local route checks, set `NEXT_PUBLIC_SITE_URL=http://127.0.0.1:3100`, run `npm run dev -- --port 3100`, then `npm run check:routes`. Tests cover environment separation, preview origins, the demo checker, auth validation, same-account phone verification, signed bot-proof expiry/tampering, AI input validation and PDF bounds. Tests also exercise username uniqueness, RLS, private lookup grants and atomic login limits in embedded PostgreSQL (PGlite). Live integration tests require configured non-production services. Regenerate the combined schema with `npm run build:database` when adding a migration.
 
 GitHub: https://github.com/ItayShorian07/ai-teacher
 

@@ -1,13 +1,17 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  accountDeletionSchema,
   accountProfileSchema,
   emailSchema,
+  getAuthErrorCode,
+  humanVerificationSchema,
   isAccountComplete,
   normalizePhone,
   otpSchema,
 } from '../lib/auth-validation';
 const profile = {
+  username: 'noa_levi',
   first_name: 'נועה',
   last_name: 'לוי',
   city: 'חיפה',
@@ -31,6 +35,54 @@ test('Israeli phone formats canonicalize without losing international support', 
   ])
     assert.equal(normalizePhone(phone), profile.phone);
   assert.equal(normalizePhone('+1 415 555 0123'), '+14155550123');
+});
+
+test('malformed provider errors cannot break public error handling', () => {
+  for (const error of [
+    null,
+    undefined,
+    'failure',
+    42,
+    { code: 7 },
+    { code: null },
+  ]) {
+    assert.equal(getAuthErrorCode(error), 'unavailable');
+  }
+  assert.equal(getAuthErrorCode({ status: 429 }), 'rate_limit');
+  assert.equal(
+    getAuthErrorCode({ code: 'email_not_confirmed' }),
+    'invalid_credentials',
+  );
+});
+
+test('sensitive account actions validate their complete request bodies', () => {
+  assert.equal(
+    humanVerificationSchema.safeParse({ token: 'valid-token' }).success,
+    true,
+  );
+  assert.equal(
+    humanVerificationSchema.safeParse({ token: 'x'.repeat(2049) }).success,
+    false,
+  );
+  assert.equal(
+    humanVerificationSchema.safeParse({
+      token: 'valid-token',
+      userId: 'another-user',
+    }).success,
+    false,
+  );
+  assert.equal(
+    accountDeletionSchema.safeParse({ confirmation: 'DELETE' }).success,
+    true,
+  );
+  for (const body of [
+    null,
+    {},
+    { confirmation: 'delete' },
+    { confirmation: 'DELETE', userId: 'another-user' },
+  ]) {
+    assert.equal(accountDeletionSchema.safeParse(body).success, false);
+  }
 });
 test('registration validates required fields and strips whitespace', () => {
   assert.equal(

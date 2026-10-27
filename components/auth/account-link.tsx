@@ -10,7 +10,7 @@ export default function AccountLink({ language }: { language: 'he' | 'en' }) {
       cache: 'no-store',
       signal: controller.signal,
     })
-      .then((r) => r.json())
+      .then((response) => response.json())
       .then((data) => setSignedIn(data.signedIn === true))
       .catch(() => {});
     return () => controller.abort();

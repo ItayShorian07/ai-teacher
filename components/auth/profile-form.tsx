@@ -3,10 +3,11 @@ import { useLanguage } from '@/hooks/use-language';
 import { getAuthErrorMessage } from '@/lib/auth-error-messages';
 import { AccountProfile, accountProfileSchema } from '@/lib/auth-validation';
 import { type Language } from '@/lib/i18n';
+import { createProfileFormValues } from '@/lib/profile-form-values';
 import { ArrowRight, CheckCircle2, Mail } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { AuthLayout } from './auth-layout';
-import { ProfileFields, createProfileFormValues } from './profile-fields';
+import { ProfileFields } from './profile-fields';
 
 import { interests } from '@/lib/profile-interests';
 import { InterestPicker } from './interest-picker';
@@ -29,7 +30,8 @@ export default function ProfileForm({
   );
   const [selectedHobbies, setSelectedHobbies] = useState<string[]>(
     (initialProfile.hobbies || []).map(
-      (h) => interests.find((row) => row.includes(h))?.[0] || h,
+      (interest) =>
+        interests.find((row) => row.includes(interest))?.[0] || interest,
     ),
   );
   const [customHobby, setCustomHobby] = useState(
@@ -68,8 +70,8 @@ export default function ProfileForm({
       await request('/api/account/profile', parsed.data);
       // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- Reload server-rendered account checks after saving the profile.
       window.location.assign('/classroom');
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'unavailable');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'unavailable');
     } finally {
       setIsBusy(false);
     }

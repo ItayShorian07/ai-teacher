@@ -11,6 +11,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 # Project working agreement
 
 - Read `docs/WORKFLOW.he.md` before changing the project. Use small feature or fix branches and pull requests into `main`.
+- Follow `docs/CODE_STRUCTURE.he.md` for component boundaries and naming. Preserve database and API field names during internal refactors.
 - Local development and Vercel Preview use non-production services. Production uses separate Supabase, Turnstile and Gemini credentials. Never copy production users or secrets into a test environment.
 - Keep `config/environments.json` accurate. It contains public environment identifiers, never secrets. Do not bypass environment checks to make a deployment pass.
 - Prefer simple functions, clear names and explicit types at external boundaries. Validate untrusted input on the server. Keep secrets and privileged clients server-side.

@@ -72,9 +72,9 @@ export function AuthLayout({
                 'Verify and get ready to learn',
                 'מאמתים ומוכנים ללמוד',
               ),
-            ].map((text, i) => (
-              <div className={step === i ? 'active' : ''} key={i}>
-                <span>{step > i ? <Check size={16} /> : i + 1}</span>
+            ].map((text, index) => (
+              <div className={step === index ? 'active' : ''} key={index}>
+                <span>{step > index ? <Check size={16} /> : index + 1}</span>
                 <p>{text}</p>
               </div>
             ))}

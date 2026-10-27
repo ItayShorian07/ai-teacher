@@ -11,7 +11,12 @@ export async function GET(request: NextRequest) {
       const { error } = await supabase.auth.exchangeCodeForSession(code);
       if (!error) {
         const response = NextResponse.redirect(
-          new URL('/account/complete', target),
+          new URL(
+            request.nextUrl.searchParams.get('next') === 'password'
+              ? '/account/password'
+              : '/account/complete',
+            target,
+          ),
         );
         response.headers.set('Cache-Control', 'private, no-store');
         return response;

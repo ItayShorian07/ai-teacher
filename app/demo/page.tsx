@@ -5,6 +5,7 @@ export default function DemoPage() {
     <Classroom
       isDemo
       profile={{
+        username: 'demo_guest',
         first_name: 'אורח',
         last_name: '',
         city: '',

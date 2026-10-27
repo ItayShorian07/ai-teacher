@@ -39,7 +39,9 @@ export type PracticeQuestion = {
   level: number;
   kind: 'linear' | 'numeric' | 'quadratic';
 };
-export function getLessonTopic(preferences: LearningPreferences): LocalizedText {
+export function getLessonTopic(
+  preferences: LearningPreferences,
+): LocalizedText {
   if (preferences.subject === 'ai')
     return bilingualText(
       'Think first. Ask better.',
@@ -82,19 +84,19 @@ export function createDemoQuestion(
     kind: 'numeric',
   };
   if (preferences.subject === 'ai') {
-    const a = 7 + variantOffset,
-      b = 7 + level;
+    const firstFactor = 7 + variantOffset;
+    const secondFactor = 7 + level;
     return {
       ...baseQuestion,
       prompt: bilingualText(
-        `An AI says ${a} × ${b} = ${a * b - 2}. Check the claim independently. What is the correct result?`,
-        `כלי AI טוען ש־${a} × ${b} = ${a * b - 2}. בדקו את הטענה בעצמכם. מה התוצאה הנכונה?`,
+        `An AI says ${firstFactor} × ${secondFactor} = ${firstFactor * secondFactor - 2}. Check the claim independently. What is the correct result?`,
+        `כלי AI טוען ש־${firstFactor} × ${secondFactor} = ${firstFactor * secondFactor - 2}. בדקו את הטענה בעצמכם. מה התוצאה הנכונה?`,
       ),
-      expression: `${a} × ${b} = ?`,
-      answer: a * b,
+      expression: `${firstFactor} × ${secondFactor} = ?`,
+      answer: firstFactor * secondFactor,
       hint: bilingualText(
-        `Break ${b} into two smaller numbers, multiply each by ${a}, and add.`,
-        `פרקו את ${b} לשני מספרים קטנים, הכפילו כל אחד ב־${a} וחברו.`,
+        `Break ${secondFactor} into two smaller numbers, multiply each by ${firstFactor}, and add.`,
+        `פרקו את ${secondFactor} לשני מספרים קטנים, הכפילו כל אחד ב־${firstFactor} וחברו.`,
       ),
       explanation: bilingualText(
         'An AI can sound confident and still make a mistake. Use a calculation, a reliable source, or a second method to check its answer.',
@@ -167,17 +169,17 @@ export function createDemoQuestion(
     };
   }
   if (preferences.stage === 'primary') {
-    const a = 3 + level,
-      b = 4 + variantOffset,
-      remove = level > 1 ? level + 2 : 0;
+    const packCount = 3 + level;
+    const stickersPerPack = 4 + variantOffset;
+    const remove = level > 1 ? level + 2 : 0;
     return {
       ...baseQuestion,
       prompt: bilingualText(
-        `Your ${hobbyLabel.en.toLowerCase()} club has ${a} packs with ${b} stickers each.${remove ? ` You give away ${remove} stickers.` : ''} How many stickers ${remove ? 'remain' : 'are there'}?`,
-        `במועדון ה${hobbyLabel.he} שלכם יש ${a} חבילות, בכל אחת ${b} מדבקות.${remove ? ` נתתם ${remove} מדבקות לחבר.` : ''} כמה מדבקות ${remove ? 'נשארו' : 'יש בסך הכול'}?`,
+        `Your ${hobbyLabel.en.toLowerCase()} club has ${packCount} packs with ${stickersPerPack} stickers each.${remove ? ` You give away ${remove} stickers.` : ''} How many stickers ${remove ? 'remain' : 'are there'}?`,
+        `במועדון ה${hobbyLabel.he} שלכם יש ${packCount} חבילות, בכל אחת ${stickersPerPack} מדבקות.${remove ? ` נתתם ${remove} מדבקות לחבר.` : ''} כמה מדבקות ${remove ? 'נשארו' : 'יש בסך הכול'}?`,
       ),
-      expression: `${a} × ${b}${remove ? ` − ${remove}` : ''} = ?`,
-      answer: a * b - remove,
+      expression: `${packCount} × ${stickersPerPack}${remove ? ` − ${remove}` : ''} = ?`,
+      answer: packCount * stickersPerPack - remove,
       hint: bilingualText(
         'First count all equal groups using multiplication. Then subtract anything given away.',
         'ספרו קודם את כל הקבוצות השוות בעזרת כפל. אחר כך הפחיתו את מה שנתתם.',
@@ -191,8 +193,8 @@ export function createDemoQuestion(
     };
   }
   if (preferences.stage === 'high') {
-    const root = 3 + variantOffset,
-      coefficient = level;
+    const root = 3 + variantOffset;
+    const coefficient = level;
     return {
       ...baseQuestion,
       kind: 'quadratic',
@@ -215,22 +217,22 @@ export function createDemoQuestion(
       recoveryAnswer: 5,
     };
   }
-  const a = 2 + level,
-    x = 5 + variantOffset,
-    b = 4 + 2 * level;
+  const packCount = 2 + level;
+  const stickersPerPack = 5 + variantOffset;
+  const extraStickers = 4 + 2 * level;
   return {
     ...baseQuestion,
     variable: 'x',
     kind: 'linear',
     prompt: bilingualText(
-      `You’re organizing a ${hobbyLabel.en.toLowerCase()} meetup. ${a} equal packs and ${b} extra stickers give you ${a * x + b} stickers in total. How many stickers are in each pack?`,
-      `אתם מארגנים מפגש ${hobbyLabel.he}. ב־${a} חבילות זהות ועוד ${b} מדבקות בודדות יש יחד ${a * x + b} מדבקות. כמה מדבקות יש בכל חבילה?`,
+      `You’re organizing a ${hobbyLabel.en.toLowerCase()} meetup. ${packCount} equal packs and ${extraStickers} extra stickers give you ${packCount * stickersPerPack + extraStickers} stickers in total. How many stickers are in each pack?`,
+      `אתם מארגנים מפגש ${hobbyLabel.he}. ב־${packCount} חבילות זהות ועוד ${extraStickers} מדבקות בודדות יש יחד ${packCount * stickersPerPack + extraStickers} מדבקות. כמה מדבקות יש בכל חבילה?`,
     ),
-    expression: `${a}x + ${b} = ${a * x + b}`,
-    answer: x,
+    expression: `${packCount}x + ${extraStickers} = ${packCount * stickersPerPack + extraStickers}`,
+    answer: stickersPerPack,
     hint: bilingualText(
-      `What operation cancels +${b}? Apply it to both sides before dividing.`,
-      `איזו פעולה מבטלת את ${b}+? בצעו אותה בשני האגפים לפני החלוקה.`,
+      `What operation cancels +${extraStickers}? Apply it to both sides before dividing.`,
+      `איזו פעולה מבטלת את ${extraStickers}+? בצעו אותה בשני האגפים לפני החלוקה.`,
     ),
     explanation: bilingualText(
       'An equation is a balance. Doing the same operation to both sides keeps it equal. For 2y + 4 = 18, subtract 4 from both sides to get 2y = 14, then divide both sides by 2.',
@@ -268,7 +270,10 @@ export function getDemoLesson(preferences: LearningPreferences): {
       'Keep both sides balanced. Undo addition first, then multiplication.',
       'שומרים על איזון בשני האגפים. מבטלים קודם את החיבור, ואז את הכפל.',
     );
-  } else if (preferences.subject === 'math' && preferences.stage === 'primary') {
+  } else if (
+    preferences.subject === 'math' &&
+    preferences.stage === 'primary'
+  ) {
     paragraphs = [
       bilingualText(
         `Your ${hobbyLabel.en.toLowerCase()} club makes four sticker packs. Each pack has four stickers. You could count every sticker, but equal groups give you a shortcut.`,

@@ -27,6 +27,8 @@ export async function POST(request: Request) {
       : await account.supabase
           .from('profiles')
           .insert({ id: account.user.id, ...parsed.data });
+    if (error?.code === '23505')
+      return privateJsonResponse({ error: 'username_unavailable' }, 409);
     if (error)
       return privateJsonResponse({ error: 'profile_unavailable' }, 503);
     return privateJsonResponse({

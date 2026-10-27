@@ -12,7 +12,8 @@ export default async function RegistrationPage({
   return (
     <AuthForm
       mode="register"
-      configured={ready.configured}
+      configured={ready.registration}
+      passwordEnabled={ready.password}
       googleEnabled={ready.google}
       initialLanguage={parameters.lang === 'en' ? 'en' : 'he'}
     />

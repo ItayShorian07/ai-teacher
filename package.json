@@ -6,16 +6,17 @@
     "dev": "next dev --hostname 127.0.0.1",
     "build": "next build",
     "start": "next start --hostname 127.0.0.1",
-    "lint": "eslint app components hooks lib tests scripts/check*.* next.config.ts proxy.ts eslint.config.mjs --max-warnings=0",
-    "format": "prettier --write app components hooks lib tests scripts/check*.* next.config.ts proxy.ts eslint.config.mjs package.json config .github",
-    "format:check": "prettier --check app components hooks lib tests scripts/check*.* next.config.ts proxy.ts eslint.config.mjs package.json config .github",
+    "lint": "eslint app components hooks lib tests scripts/check*.* scripts/build-database-setup.mjs next.config.ts proxy.ts eslint.config.mjs --max-warnings=0",
+    "format": "prettier --write app components hooks lib tests scripts/check*.* scripts/build-database-setup.mjs next.config.ts proxy.ts eslint.config.mjs package.json config .github",
+    "format:check": "prettier --check app components hooks lib tests scripts/check*.* scripts/build-database-setup.mjs next.config.ts proxy.ts eslint.config.mjs package.json config .github",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build:check",
     "build:check": "node scripts/check-build.mjs",
     "check:env": "tsx scripts/check-environment.ts",
     "check:connections": "tsx scripts/check-connections.mjs",
-    "check:routes": "node scripts/check-routes.mjs"
+    "check:routes": "node scripts/check-routes.mjs",
+    "build:database": "node scripts/build-database-setup.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -28,6 +29,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.12",
     "@next/env": "16.3.5",
     "@types/node": "^22.19.0",
     "@types/react": "^19.2.0",

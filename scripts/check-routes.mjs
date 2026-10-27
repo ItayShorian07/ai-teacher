@@ -1,12 +1,15 @@
 import assert from 'node:assert/strict';
-const base = 'http://127.0.0.1:3100';
-for (const [path, status, expected] of [
+const base = process.env.BASE_URL || 'http://127.0.0.1:3100';
+const origin = process.env.TEST_ORIGIN || base;
+for (const [path, status, expected, redirectTo = '/login'] of [
   ['/', 200, 'טוב שחזרתם'],
   ['/demo', 200, 'אתם בדמו'],
-  ['/register', 200, 'בית ספר'],
+  ['/register', 200, 'שם משתמש'],
+  ['/forgot-password', 200, 'איפוס סיסמה'],
   ['/contact', 200, 'בואו נדבר.'],
   ['/classroom', 307, ''],
   ['/account', 307, ''],
+  ['/account/password', 307, '', '/forgot-password'],
   ['/missing-page', 404, 'הדף לא נמצא'],
 ]) {
   const r = await fetch(base + path, { redirect: 'manual' });
@@ -14,9 +17,10 @@ for (const [path, status, expected] of [
   if (status === 307) {
     const destination = r.headers.get('location');
     const streamedRedirect =
-      html.includes('http-equiv="refresh"') && html.includes('url=/login');
+      html.includes('http-equiv="refresh"') &&
+      html.includes(`url=${redirectTo}`);
     assert.ok(
-      (r.status === 307 && destination === '/login') ||
+      (r.status === 307 && destination === redirectTo) ||
         (r.status === 200 && streamedRedirect),
       `${path}: protected redirect missing`,
     );
@@ -29,7 +33,7 @@ for (const [path, status, expected] of [
 for (const path of ['/api/tutor', '/api/answers/pdf', '/api/account/delete']) {
   const r = await fetch(base + path, {
     method: 'POST',
-    headers: { origin: base, 'content-type': 'application/json' },
+    headers: { origin, 'content-type': 'application/json' },
     body: JSON.stringify(
       path === '/api/tutor'
         ? {
@@ -58,3 +62,13 @@ for (const path of ['/api/tutor', '/api/answers/pdf', '/api/account/delete']) {
   assert.equal(cross.status, 403, path);
   console.log(path, 'rejects cross-origin request', cross.status);
 }
+const passwordCross = await fetch(base + '/api/auth/password', {
+  method: 'POST',
+  headers: {
+    origin: 'https://untrusted.example',
+    'content-type': 'application/json',
+  },
+  body: '{}',
+});
+assert.equal(passwordCross.status, 403);
+console.log('/api/auth/password rejects cross-origin requests');

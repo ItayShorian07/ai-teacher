@@ -3,7 +3,7 @@ import { AccountProfile } from '../auth-validation';
 import { isAuthConfigured } from '../supabase/config';
 import { createServerSupabaseClient } from '../supabase/server';
 export const profileColumns =
-  'first_name,last_name,city,age,phone,locale,school,hobbies,custom_hobby';
+  'username,first_name,last_name,city,age,phone,locale,school,hobbies,custom_hobby';
 export async function getCurrentAccount() {
   if (!isAuthConfigured()) return null;
   const supabase = await createServerSupabaseClient();

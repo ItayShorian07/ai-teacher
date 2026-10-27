@@ -25,10 +25,11 @@ export default function AccountDetails({
     if (isBusy) return;
     setIsBusy(true);
     try {
-      const { error: err } = await createBrowserSupabaseClient().auth.signOut({
-        scope: 'local',
-      });
-      if (err) throw err;
+      const { error: authError } =
+        await createBrowserSupabaseClient().auth.signOut({
+          scope: 'local',
+        });
+      if (authError) throw authError;
       // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- Clear session-scoped client state after sign-out.
       window.location.assign(`/login?lang=${language}`);
     } catch {
@@ -85,6 +86,10 @@ export default function AccountDetails({
       )}
       <dl className="account-details">
         <div>
+          <dt>{translate('Username', 'שם משתמש')}</dt>
+          <dd dir="ltr">{profile.username}</dd>
+        </div>
+        <div>
           <dt>{translate('Full name', 'שם מלא')}</dt>
           <dd>
             {profile.first_name} {profile.last_name}
@@ -118,6 +123,9 @@ export default function AccountDetails({
           <Settings2 size={16} />
           {translate('Edit details', 'עריכת פרטים')}
         </Link>
+        <Link href={`/account/password?lang=${language}`}>
+          {translate('Set / change password', 'הגדרה / שינוי סיסמה')}
+        </Link>
         <button onClick={signOut} disabled={isBusy}>
           <LogOut size={16} />
           {translate('Sign out', 'התנתקות')}
@@ -142,7 +150,7 @@ export default function AccountDetails({
               {translate('Confirmation', 'אישור מחיקה')}
               <input
                 value={confirmation}
-                onChange={(e) => setConfirmation(e.target.value)}
+                onChange={(event) => setConfirmation(event.target.value)}
                 autoComplete="off"
                 dir="ltr"
               />

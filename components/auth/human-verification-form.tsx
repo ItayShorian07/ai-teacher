@@ -6,10 +6,10 @@ import { AuthLayout } from './auth-layout';
 import { TurnstileChallenge } from './turnstile-challenge';
 export default function HumanVerificationForm() {
   const { language, setLanguage, translate } = useLanguage('he');
-  const [token, setToken] = useState(''),
-    [error, setError] = useState(''),
-    [isBusy, setIsBusy] = useState(false),
-    [version, setVersion] = useState(0);
+  const [token, setToken] = useState('');
+  const [error, setError] = useState('');
+  const [isBusy, setIsBusy] = useState(false);
+  const [version, setVersion] = useState(0);
   const onToken = useCallback((value: string) => setToken(value), []);
   async function verify() {
     setIsBusy(true);
@@ -25,7 +25,7 @@ export default function HumanVerificationForm() {
       window.location.assign('/classroom');
     } catch {
       setToken('');
-      setVersion((v) => v + 1);
+      setVersion((value) => value + 1);
       setError('captcha');
       setIsBusy(false);
     }

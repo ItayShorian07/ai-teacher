@@ -27,7 +27,8 @@ const config: NextConfig = {
         ],
       },
       {
-        source: '/(login|register|account|auth|api/account)/:path*',
+        source:
+          '/(login|register|forgot-password|account|auth|api/account|api/auth)/:path*',
         headers: [
           { key: 'Cache-Control', value: 'private, no-store' },
           { key: 'Referrer-Policy', value: 'no-referrer' },

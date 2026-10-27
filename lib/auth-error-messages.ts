@@ -1,6 +1,27 @@
 import type { Language } from './i18n';
-export const getAuthErrorMessage = (code: string, lang: Language) => {
+export const getAuthErrorMessage = (code: string, language: Language) => {
   const messages: Record<string, [string, string]> = {
+    invalid_login: [
+      'Enter your username or email and password.',
+      'הזינו שם משתמש או מייל וסיסמה.',
+    ],
+    invalid_credentials: [
+      'The username/email or password is incorrect, or the email has not been verified. Use an email code or reset your password.',
+      'שם המשתמש/המייל או הסיסמה שגויים, או שהמייל עדיין לא אומת. אפשר להיכנס בקוד למייל או לאפס סיסמה.',
+    ],
+    username_unavailable: [
+      'This username is already taken. Please choose another.',
+      'שם המשתמש הזה כבר תפוס. בחרו שם אחר.',
+    ],
+    weak_password: [
+      'Use a password with 12–128 characters.',
+      'בחרו סיסמה באורך 12–128 תווים.',
+    ],
+    password_mismatch: ['The passwords do not match.', 'הסיסמאות אינן זהות.'],
+    same_password: [
+      'Choose a password different from your current password.',
+      'בחרו סיסמה שונה מהסיסמה הנוכחית.',
+    ],
     delete_unavailable: [
       'Account deletion is temporarily unavailable. Please contact support.',
       'מחיקת החשבון אינה זמינה כרגע. פנו אלינו דרך יצירת קשר.',
@@ -50,5 +71,5 @@ export const getAuthErrorMessage = (code: string, lang: Language) => {
   return (messages[code] || [
     'We couldn’t complete the request. Try again later.',
     'לא הצלחנו להשלים את הבקשה. נסו שוב מאוחר יותר.',
-  ])[lang === 'he' ? 1 : 0];
+  ])[language === 'he' ? 1 : 0];
 };

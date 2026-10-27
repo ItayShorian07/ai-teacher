@@ -28,7 +28,7 @@ const url = process.env.NEXT_PUBLIC_SUPABASE_URL,
 if (!url || !key) process.exit(1);
 for (const path of [
   '/auth/v1/settings',
-  '/rest/v1/profiles?select=id,school,hobbies,custom_hobby&limit=0',
+  '/rest/v1/profiles?select=id,username,school,hobbies,custom_hobby&limit=0',
   '/rest/v1/material_chunks?select=id&limit=0',
   '/rest/v1/question_items?select=id&limit=0',
   '/rest/v1/learning_cache?select=id&limit=0',

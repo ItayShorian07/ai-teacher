@@ -136,12 +136,14 @@ export default function TutorPanel({ session }: { session: ClassroomSession }) {
                 'בונים הבנה, צעד אחר צעד',
               ),
               bilingualText('Leave with an "I get it"', 'מסיימים עם ״הבנתי״'),
-            ].map((item, i) => (
+            ].map((item, index) => (
               <div
-                className={`plan-step ${i === currentStep ? 'active' : ''}`}
-                key={i}
+                className={`plan-step ${index === currentStep ? 'active' : ''}`}
+                key={index}
               >
-                <span>{i < currentStep ? <Check size={14} /> : i + 1}</span>
+                <span>
+                  {index < currentStep ? <Check size={14} /> : index + 1}
+                </span>
                 {localize(item)}
               </div>
             ))}

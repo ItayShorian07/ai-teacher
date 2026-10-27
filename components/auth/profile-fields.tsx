@@ -1,26 +1,9 @@
 'use client';
 
-import type { AccountProfile } from '@/lib/auth-validation';
 import { createTranslator, type Language } from '@/lib/i18n';
 import type { InputHTMLAttributes } from 'react';
 
-type ProfileField =
-  'first_name' | 'last_name' | 'city' | 'age' | 'phone' | 'school';
-export type ProfileFormValues = Record<ProfileField, string>;
-
-export function createProfileFormValues(
-  profile: Partial<AccountProfile> = {},
-): ProfileFormValues {
-  return {
-    first_name: profile.first_name || '',
-    last_name: profile.last_name || '',
-    city: profile.city || '',
-    age: profile.age?.toString() || '',
-    phone: profile.phone || '',
-    school: profile.school || '',
-  };
-}
-
+import type { ProfileFormValues } from '@/lib/profile-form-values';
 export function ProfileFields({
   language,
   values,
@@ -32,7 +15,7 @@ export function ProfileFields({
 }) {
   const translate = createTranslator(language);
   function field(
-    name: ProfileField,
+    name: keyof ProfileFormValues,
     label: string,
     attributes: InputHTMLAttributes<HTMLInputElement> = {},
   ) {
@@ -54,6 +37,21 @@ export function ProfileFields({
   }
   return (
     <>
+      {field('username', translate('Username', 'שם משתמש'), {
+        dir: 'ltr',
+        autoComplete: 'username',
+        autoCapitalize: 'none',
+        spellCheck: false,
+        minLength: 3,
+        maxLength: 30,
+        pattern: '[A-Za-z][A-Za-z0-9_]{2,29}',
+      })}
+      <p className="auth-field-note">
+        {translate(
+          '3–30 English letters, numbers or underscores. Start with a letter.',
+          '3–30 אותיות באנגלית, ספרות או קו תחתון. מתחילים באות.',
+        )}
+      </p>
       <div className="auth-field-row">
         {field('first_name', translate('First name', 'שם פרטי'), {
           autoComplete: 'given-name',

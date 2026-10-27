@@ -53,8 +53,8 @@ export default function SessionSummary({
           <span>{translate('Practice level', 'רמת התרגול')}</span>
         </div>
       </div>
-      {practiceHistory.map((record, i) => (
-        <div className="record" key={i}>
+      {practiceHistory.map((record, index) => (
+        <div className="record" key={index}>
           <CheckCircle2 size={18} />
           <span>
             <strong>{record.topic}</strong>

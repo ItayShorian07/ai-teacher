@@ -1,9 +1,11 @@
-import { parsePolynomial } from './polynomial';
 import { LocalizedText, bilingualText } from '@/lib/i18n';
 import { PracticeQuestion } from './demo-lessons';
+import { parsePolynomial } from './polynomial';
 export function evaluateArithmetic(input: string): number | null {
   const polynomial = parsePolynomial(input);
-  return polynomial && polynomial[1] === 0 && polynomial[2] === 0 ? polynomial[0] : null;
+  return polynomial && polynomial[1] === 0 && polynomial[2] === 0
+    ? polynomial[0]
+    : null;
 }
 export type AnswerFeedback = {
   status: 'correct' | 'continue' | 'mistake' | 'clarify';
@@ -54,11 +56,11 @@ export function checkPracticeAnswer(
   if (!lines.length) return clarify();
   let feedback: AnswerFeedback = clarify();
   for (const line of lines) {
-    const s = line.replace(/\s/g, '');
-    const parts = s.split('=');
+    const normalizedLine = line.replace(/\s/g, '');
+    const parts = normalizedLine.split('=');
     if (parts.length > 2) return clarify();
     if (parts.length === 1) {
-      const value = evaluateArithmetic(s);
+      const value = evaluateArithmetic(normalizedLine);
       feedback =
         value === null
           ? clarify()
@@ -77,12 +79,14 @@ export function checkPracticeAnswer(
           : Math.abs(value - question.answer) < 1e-8
             ? correct()
             : mistake();
-    } else if (/[a-z]/.test(s)) {
+    } else if (/[a-z]/.test(normalizedLine)) {
       if (!question.variable) return clarify();
-      const left = parsePolynomial(parts[0], question.variable),
-        right = parsePolynomial(parts[1], question.variable);
+      const left = parsePolynomial(parts[0], question.variable);
+      const right = parsePolynomial(parts[1], question.variable);
       if (!left || !right) return clarify();
-      const [constant, linear, quadratic] = left.map((n, i) => n - right[i]);
+      const [constant, linear, quadratic] = left.map(
+        (root, index) => root - right[index],
+      );
       if (Math.abs(quadratic) < 1e-10 && Math.abs(linear) < 1e-10)
         return Math.abs(constant) < 1e-10
           ? response(
@@ -91,7 +95,8 @@ export function checkPracticeAnswer(
               'השוויון הזה אינו עוזר למצוא את הנעלם. נסו שלב שמבודד אותו.',
             )
           : mistake();
-      if (question.kind === 'linear' && Math.abs(quadratic) > 1e-10) return clarify();
+      if (question.kind === 'linear' && Math.abs(quadratic) > 1e-10)
+        return clarify();
       let roots: number[] = [];
       if (Math.abs(quadratic) < 1e-10) roots = [-constant / linear];
       else {
@@ -102,14 +107,16 @@ export function checkPracticeAnswer(
             (-linear - Math.sqrt(discriminant)) / (2 * quadratic),
           ];
       }
-      if (question.kind === 'quadratic') roots = roots.filter((n) => n > 0);
+      if (question.kind === 'quadratic')
+        roots = roots.filter((root) => root > 0);
       feedback =
-        roots.length > 0 && roots.every((n) => Math.abs(n - question.answer) < 1e-8)
+        roots.length > 0 &&
+        roots.every((root) => Math.abs(root - question.answer) < 1e-8)
           ? continuing()
           : mistake();
     } else {
-      const left = evaluateArithmetic(parts[0]),
-        right = evaluateArithmetic(parts[1]);
+      const left = evaluateArithmetic(parts[0]);
+      const right = evaluateArithmetic(parts[1]);
       feedback =
         left === null || right === null
           ? clarify()

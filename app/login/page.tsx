@@ -13,6 +13,7 @@ export default async function LoginPage({
     <AuthForm
       mode="login"
       configured={ready.configured}
+      passwordEnabled={ready.password}
       googleEnabled={ready.google}
       initialLanguage={parameters.lang === 'en' ? 'en' : 'he'}
       errorCode={parameters.error === 'callback' ? 'callback' : ''}
