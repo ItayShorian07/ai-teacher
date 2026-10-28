@@ -14,8 +14,8 @@ export default function ContactPage() {
       <span className="auth-card-label">כאן כדי לעזור</span>
       <h1>בואו נדבר.</h1>
       <p>שאלה, רעיון או משהו שלא עובד? נשמח לשמוע.</p>
-      <a className="primary-button" href="mailto:itaymyphotos1@gmail.com">
-        itaymyphotos1@gmail.com
+      <a className="primary-button" href="mailto:limud.admin@gmail.com">
+        limud.admin@gmail.com
       </a>
       <p className="auth-field-note">
         אל תשלחו סיסמאות, קודי אימות או מסמכים אישיים במייל.
